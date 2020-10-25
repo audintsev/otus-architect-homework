@@ -23,13 +23,13 @@ public class PersonService {
         this.databaseClient = databaseClient;
     }
 
-    public Flux<Person> listUsers() {
+    public Flux<Person> list() {
         return databaseClient.sql("SELECT id, first, last from %s".formatted(TABLE_NAME))
                 .map(USER_MAPPER)
                 .all();
     }
 
-    public Mono<Person> insertUser(String first, String last) {
+    public Mono<Person> insert(String first, String last) {
         return databaseClient.sql("INSERT INTO %s (first, last) VALUES (:first, :last)".formatted(TABLE_NAME))
                 .filter(statement -> statement.returnGeneratedValues("id"))
                 .bind("first", first)
