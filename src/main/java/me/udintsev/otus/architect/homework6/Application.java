@@ -1,5 +1,7 @@
 package me.udintsev.otus.architect.homework6;
 
+import me.udintsev.otus.architect.homework6.person.PersonHandler;
+import me.udintsev.otus.architect.homework6.person.PersonService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +18,4 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @Bean
-    public RouterFunction<?> personRouterFn(PersonService personService) {
-        return new PersonHandler(URI.create("/person"), personService).routerFunction();
-    }
 }

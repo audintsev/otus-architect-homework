@@ -1,7 +1,8 @@
-package me.udintsev.otus.architect.homework6;
+package me.udintsev.otus.architect.homework6.person;
 
 import lombok.Data;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -10,20 +11,15 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
+@Component
 public class PersonHandler {
-    private final URI baseUri;
+    public static final String BASE_PATH = "/person";
+    private static final URI BASE_URI = URI.create(BASE_PATH);
+
     private final PersonService personService;
 
-    public PersonHandler(URI baseUri, PersonService personService) {
-        this.baseUri = baseUri;
+    public PersonHandler(PersonService personService) {
         this.personService = personService;
-    }
-
-    public RouterFunction<?> routerFunction() {
-        return RouterFunctions.route()
-                .GET(baseUri.toString(), this::list)
-                .POST(baseUri.toString(), this::insert)
-                .build();
     }
 
     public Mono<ServerResponse> list(ServerRequest request) {
@@ -44,7 +40,7 @@ public class PersonHandler {
                 .flatMap(person -> personService.insert(person.getFirst(), person.getLast()))
                 .flatMap(person ->
                         ServerResponse
-                                .created(baseUri.resolve(String.valueOf(person.getId())))
+                                .created(BASE_URI.resolve(String.valueOf(person.getId())))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(person));
     }
