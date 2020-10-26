@@ -1,0 +1,13 @@
+= People API
+:toc: left
+:doctype: article
+:icons: font
+:source-highlighter: highlightjs
+
+== Create a person
+
+operation::create[]
+
+== List people
+
+operation::list[]

@@ -54,6 +54,22 @@ test {
 }
 
 asciidoctor {
+    // See https://asciidoctor.github.io/asciidoctor-gradle-plugin/maintenance-1.5/
     inputs.dir snippetsDir
     dependsOn test
+    sourceDir  file('src/main/asciidoc')
+}
+
+bootJar {
+    // See https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/html/
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
+//    from ("${asciidoctor.outputDir}/html5") {
+//        into 'BOOT-INF/classes/static/docs'
+//    }
+//    from ("${asciidoctor.outputDir}/html5") {
+//        into 'META-INF/resources/docs'
+//    }
 }

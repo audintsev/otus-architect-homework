@@ -1,11 +1,12 @@
 package me.udintsev.otus.architect.homework6.person;
 
 import me.udintsev.otus.architect.homework6.DatabaseConfig;
-import me.udintsev.otus.architect.homework6.person.PersonService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import reactor.test.StepVerifier;
+
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,22 +16,30 @@ class PersonServiceTest {
     PersonService personService;
 
     @Test
-    void insertAndListUsers() {
-        var user1 = personService.insert("SomeFirst", "SomeLast").block();
-        assertThat(user1).isNotNull();
-        assertThat(user1.getId()).isNotNull();
-        assertThat(user1.getFirst()).isEqualTo("SomeFirst");
-        assertThat(user1.getLast()).isEqualTo("SomeLast");
+    void insertAndList() {
+        Consumer<Person> person1Verifier = person -> {
+            assertThat(person).isNotNull();
+            assertThat(person.getId()).isNotNull();
+            assertThat(person.getFirst()).isEqualTo("SomeFirst");
+            assertThat(person.getLast()).isEqualTo("SomeLast");
+        };
+        personService.create("SomeFirst", "SomeLast").as(StepVerifier::create)
+                .assertNext(person1Verifier)
+                .verifyComplete();
 
-        var user2 = personService.insert("AnotherFirst", "AnotherLast").block();
-        assertThat(user2).isNotNull();
-        assertThat(user2.getId()).isNotNull();
-        assertThat(user2.getFirst()).isEqualTo("AnotherFirst");
-        assertThat(user2.getLast()).isEqualTo("AnotherLast");
+        Consumer<Person> person2Verifier = person -> {
+            assertThat(person).isNotNull();
+            assertThat(person.getId()).isNotNull();
+            assertThat(person.getFirst()).isEqualTo("AnotherFirst");
+            assertThat(person.getLast()).isEqualTo("AnotherLast");
+        };
+        personService.create("AnotherFirst", "AnotherLast").as(StepVerifier::create)
+                .assertNext(person2Verifier)
+                .verifyComplete();
 
-        StepVerifier.create(personService.list())
-                .expectNext(user1)
-                .expectNext(user2)
+        personService.list().as(StepVerifier::create)
+                .assertNext(person1Verifier)
+                .assertNext(person2Verifier)
                 .verifyComplete();
     }
 }

@@ -29,7 +29,7 @@ public class PersonService {
                 .all();
     }
 
-    public Mono<Person> insert(String first, String last) {
+    public Mono<Person> create(String first, String last) {
         return databaseClient.sql("INSERT INTO %s (first, last) VALUES (:first, :last)".formatted(TABLE_NAME))
                 .filter(statement -> statement.returnGeneratedValues("id"))
                 .bind("first", first)

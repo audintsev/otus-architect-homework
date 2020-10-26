@@ -11,8 +11,8 @@ public class RouterConfig {
     @Bean
     public RouterFunction<?> personRouterFn(PersonHandler personHandler) {
         return RouterFunctions.route()
-                .GET(PersonHandler.BASE_PATH, personHandler::list)
-                .POST(PersonHandler.BASE_PATH, personHandler::insert)
+                .GET(PersonHandler.BASE_PATH, req -> personHandler.list())
+                .POST(PersonHandler.BASE_PATH, personHandler::create)
                 .build();
     }
 }
