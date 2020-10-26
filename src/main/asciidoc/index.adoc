@@ -8,6 +8,18 @@
 
 operation::create[]
 
+== Get a person
+
+operation::get[]
+
 == List people
 
 operation::list[]
+
+== Update a person
+
+operation::update[]
+
+== Delete a person
+
+operation::delete[]
