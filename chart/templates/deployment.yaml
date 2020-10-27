@@ -31,13 +31,13 @@ spec:
           livenessProbe:
             httpGet:
               port: 8080
-              path: /actuator/health
+              path: /actuator/health/liveness
             initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 2
           readinessProbe:
             httpGet:
               port: 8080
-              path: /actuator/health
+              path: /actuator/health/readiness
             initialDelaySeconds: 5
             periodSeconds: 5
