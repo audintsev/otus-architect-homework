@@ -61,7 +61,9 @@ TODO (?):
 
 * Building native image
 * CI with Github actions (possibly publishing generated API docs as a Github pages site)
-
+* Spring Framework 5.3 [has been released](https://spring.io/blog/2020/10/27/spring-framework-5-3-goes-ga)
+  on October 27. I expect Boot 2.4 to be released soon too - and then update dependencies.
+  
 Comments:
 
 * I don't use embedded DB migrations (managed by Liquibase or Flyway). Tests create schema defined in
@@ -77,7 +79,7 @@ one and the new one - co-exist in the same deployment.
 * A lot of R2DBC foundation stuff is being moved from Spring Data R2DBC to Spring Framework 5.3. I decided to go ahead
 and use the new stuff from Soring 5.3. But at the time of this writing Spring Framework 5.3 is still only available as
 a milestone release (as a dependency of a milestone release of Spring Boot 2.4). That's how I ended up using pre-release
-versions of Spring
+versions of Spring.
 * Even though API documentation _is_ generated, Boot difficulties serving it (as embedded static content), perhaps
 due to the pre-release Boot version being used
 
