@@ -1,0 +1,20 @@
+replicaCount: 2
+
+image:
+  repository: udintsev/otus-architect-homework6
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  host: arch.homework
+  pathPrefix: /otusapp/audintsev
+
+postgresql:
+  enabled: true
+  postgresqlUsername: myuser
+  postgresqlPassword: passwd
+  postgresqlDatabase: myapp
+  service:
+    port: "5432"
