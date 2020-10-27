@@ -1,8 +1,53 @@
 # Homework for the lesson #6 (Kubernetes basics) of the [Otus "Software Architect" course](https://otus.ru/lessons/arhitektor-po/) 
 
-## Kubernetes
+## Deploying application on a Kubernetes cluster as Helm release
 
-TODO
+```
+git clone https://github.com/audintsev/otus-architect-homework6.git
+cd otus-architect-homework6
+helm install homework6 ./chart
+```
+
+## Undeploying
+
+```
+helm uninstall homework6
+```
+
+To also delete persistent volume: `kubectl get pvc`, followed by:
+
+```
+kubectl delete pvc data-homework6-postgresql-0
+```
+
+## Invoking with curl
+
+Assuming `arch.homework` resolves to the IP address where Ingress controller listens,
+
+List people:
+```
+curl http://arch.homework/otusapp/audintsev/person
+```
+
+Add a person:
+```
+curl -H 'Content-Type: application/json' http://arch.homework/otusapp/audintsev/person -d '{"first": "Some", "last": "Other"}'
+```
+
+Get a specific person:
+```
+curl http://arch.homework/otusapp/audintsev/person/1
+```
+
+Update a person:
+```
+curl -H 'Content-Type: application/json' -X PUT http://arch.homework/otusapp/audintsev/person/2 -d '{"first": "Yet", "last": "Another"}'
+```
+
+Delete a person:
+```
+curl -X DELETE http://arch.homework/otusapp/audintsev/person/2
+```
 
 ## Application
 
@@ -50,18 +95,11 @@ Running (assuming Postgres is available on localhost:5432):
 java -jar otus-architect-homework6-0.0.1-SNAPSHOT.jar --spring.r2dbc.url=r2dbc:postgresql://localhost/test --spring.r2dbc.username=test --spring.r2dbc.password=test
 ```
 
-### Image: building and running
-
-Building:
+### Image: building and pushing
 
 ```
 ./gradlew bootBuildImage --imageName=udintsev/otus-architect-homework6:0.1
-```
-
-Running (assuming Postgres is available on localhost:5432, which is not):
-
-```
-docker run -e spring.r2dbc.url=r2dbc:postgresql://localhost/test -e spring.r2dbc.username=test -e spring.r2dbc.password=test -p 8080:8080 udintsev/otus-architect-homework6:0.1
+docker push udintsev/otus-architect-homework6:0.1
 ```
 
 ### Useful links
