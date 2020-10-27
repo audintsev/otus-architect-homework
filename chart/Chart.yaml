@@ -4,12 +4,12 @@ description: OTUS architect course, homework6
 
 type: application
 
-version: 0.1.0
+version: 0.1.1
 appVersion: "0.1"
 
 dependencies:
   - name: postgresql
-    version: 8.x.x
+    version: 9.x.x
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
     tags:
