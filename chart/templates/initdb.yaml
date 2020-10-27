@@ -48,7 +48,7 @@ spec:
           - "-c"
           - |
             psql $DATABASE_URI <<'EOF'
-                create table person (id serial primary key, first varchar, last varchar);
+                create table if not exists person (id serial primary key, first varchar, last varchar);
                 insert into person (first, last) values ('John', 'Doe');
             EOF
 
