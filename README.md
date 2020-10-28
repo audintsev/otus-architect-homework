@@ -33,7 +33,7 @@ kubectl delete -f manifests
 helm delete postgres
 ```
 
-Optionally, to delete also PVC: `kubectl get pvc`, followed by: `kubectl delete pvc data-homework6-postgresql-0`
+Optionally, to delete also PVC: `kubectl get pvc`, followed by: `kubectl delete pvc data-postgres-postgresql-0`
 
 ## Invoking with curl
 
