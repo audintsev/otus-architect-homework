@@ -49,7 +49,6 @@ spec:
           - |
             psql $DATABASE_URI <<'EOF'
                 create table if not exists person (id serial primary key, first_name varchar(255) not null, last_name varchar(255) not null);
-                insert into person (first_name, last_name) values ('John', 'Doe');
             EOF
 
   backoffLimit: 0
