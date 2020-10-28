@@ -1,0 +1,5 @@
+postgresqlDatabase: myapp
+postgresqlUsername: myuser
+postgresqlPassword: passwd
+service:
+  port: "5432"

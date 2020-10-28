@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: homework6-initdb-job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: check-db-ready
+          image: postgres:latest
+          envFrom:
+            - configMapRef:
+                name: homework6-configmap
+          command:
+            - sh
+            - "-c"
+            - |
+              until pg_isready -h $POSTGRES_HOST  -p  $POSTGRES_PORT;
+              do echo waiting for database; sleep 2; done;
+      containers:
+        - name: post-install-job
+          envFrom:
+            - configMapRef:
+                name: homework6-configmap
+            - secretRef:
+                name: homework6-secret
+          image: postgres:latest
+          command:
+            - sh
+            - "-c"
+            - |
+              psql postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB} <<'EOF'
+                  create table if not exists person (id serial primary key, first_name varchar(255) not null, last_name varchar(255) not null);
+              EOF
+
+  backoffLimit: 0

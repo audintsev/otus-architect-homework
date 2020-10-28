@@ -1,24 +1,39 @@
 # Homework for the lesson #6 (Kubernetes basics) of the [Otus "Software Architect" course](https://otus.ru/lessons/arhitektor-po/) 
 
-## Deploying application on a Kubernetes cluster as Helm release
+## Deploying as Helm release
 
+Deploying:
 ```
 git clone https://github.com/audintsev/otus-architect-homework6.git
 cd otus-architect-homework6
 helm install homework6 ./chart
 ```
 
-## Undeploying
-
+Undeploying:
 ```
 helm uninstall homework6
 ```
 
-To also delete persistent volume: `kubectl get pvc`, followed by:
+Optionally, to delete also PVC: `kubectl get pvc`, followed by: `kubectl delete pvc data-homework6-postgresql-0`
 
+## Deploying with manifests
+
+Deploying:
 ```
-kubectl delete pvc data-homework6-postgresql-0
+helm repo add bitnami https://charts.bitnami.com/bitnami
+git clone https://github.com/audintsev/otus-architect-homework6.git
+cd otus-architect-homework6/manifests
+helm install -f values.yaml postgres bitnami/postgresql
+kubectl apply -f manifests
 ```
+
+Undeploying:
+```
+kubectl delete -f manifests
+helm delete postgres
+```
+
+Optionally, to delete also PVC: `kubectl get pvc`, followed by: `kubectl delete pvc data-homework6-postgresql-0`
 
 ## Invoking with curl
 
