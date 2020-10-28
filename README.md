@@ -35,6 +35,13 @@ helm delete postgres
 
 Optionally, to delete also PVC: `kubectl get pvc`, followed by: `kubectl delete pvc data-postgres-postgresql-0`
 
+## Invoking the postman collection
+
+`cd` to the root of the cloned repo, and then:
+```
+newman run postman_collection.json 
+```
+
 ## Invoking with curl
 
 Assuming `arch.homework` resolves to the IP address where Ingress controller listens,
