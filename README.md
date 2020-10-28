@@ -62,7 +62,8 @@ TODO (?):
 * Building native image
 * CI with Github actions (possibly publishing generated API docs as a Github pages site)
 * Spring Framework 5.3 [has been released](https://spring.io/blog/2020/10/27/spring-framework-5-3-goes-ga)
-  on October 27. I expect Boot 2.4 to be released soon too - and then update dependencies.
+  on October 27, and [Boot 2.4.0-RC1 is due by October 29](https://github.com/spring-projects/spring-boot/milestones)
+  -> update dependencies.
   
 Comments:
 
