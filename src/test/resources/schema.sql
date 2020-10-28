@@ -1,5 +1,5 @@
 CREATE TABLE person (
     id SERIAL PRIMARY KEY,
-    first VARCHAR(255),
-    last VARCHAR(255)
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL
 );

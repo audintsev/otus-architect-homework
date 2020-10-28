@@ -36,8 +36,8 @@ public class PersonApiTest {
 
     private static final FieldDescriptor[] PERSON_DESCRIPTOR = new FieldDescriptor[]{
             fieldWithPath("id").description("ID of the person"),
-            fieldWithPath("first").description("Person first name"),
-            fieldWithPath("last").description("Person last name")
+            fieldWithPath("firstName").description("Person first name"),
+            fieldWithPath("lastName").description("Person last name")
     };
 
     private static final PathParametersSnippet ID_PATH_PARAMETERS_DESCRIPTOR = pathParameters(
@@ -53,12 +53,24 @@ public class PersonApiTest {
 
     @Test
     void createAndList() {
-        String location;
+        // Try create a person with no firstName/lastName
+        webTestClient.post()
+                .uri("/person")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.firstName").value(
+                value -> assertThat((String)value).contains("must not be null"))
+                .jsonPath("$.lastName").value(
+                value -> assertThat((String)value).contains("must not be null"));
+
         long id;
 
         // Create
         {
-            List<String> locationHolder = new ArrayList<>(1);
             List<Long> idHolder = new ArrayList<>(1);
 
             webTestClient.post()
@@ -66,8 +78,8 @@ public class PersonApiTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue("""
                             {
-                              "first": "%s",
-                              "last": "%s"
+                              "firstName": "%s",
+                              "lastName": "%s"
                             }
                             """.formatted(SOME_FIRST_NAME, SOME_LAST_NAME))
                     .exchange()
@@ -76,24 +88,22 @@ public class PersonApiTest {
                     .expectHeader()
                     .value("location",
                             l -> {
-                                locationHolder.add(l);
                                 assertThat(l).startsWith("/person/");
                                 assertThat(l).hasSizeGreaterThan("/person/".length());
                             })
                     .expectBody()
                     .jsonPath("$.id").isNumber()
                     .jsonPath("$.id").value(idHolder::add, Long.class)
-                    .jsonPath("$.first").isEqualTo(SOME_FIRST_NAME)
-                    .jsonPath("$.last").isEqualTo(SOME_LAST_NAME)
+                    .jsonPath("$.firstName").isEqualTo(SOME_FIRST_NAME)
+                    .jsonPath("$.lastName").isEqualTo(SOME_LAST_NAME)
                     .consumeWith(document("create",
                             requestFields(
-                                    fieldWithPath("first").description("First name of the person to create"),
-                                    fieldWithPath("last").description("Last name of the person to create")
+                                    fieldWithPath("firstName").description("First name of the person to create"),
+                                    fieldWithPath("lastName").description("Last name of the person to create")
                             ),
                             responseFields(PERSON_DESCRIPTOR)
                     ));
 
-            location = locationHolder.get(0);
             id = idHolder.get(0);
         }
 
@@ -105,8 +115,8 @@ public class PersonApiTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(id)
-                .jsonPath("$.first").isEqualTo(SOME_FIRST_NAME)
-                .jsonPath("$.last").isEqualTo(SOME_LAST_NAME)
+                .jsonPath("$.firstName").isEqualTo(SOME_FIRST_NAME)
+                .jsonPath("$.lastName").isEqualTo(SOME_LAST_NAME)
                 .consumeWith(document("get",
                         ID_PATH_PARAMETERS_DESCRIPTOR,
                         responseFields(PERSON_DESCRIPTOR)
@@ -131,13 +141,29 @@ public class PersonApiTest {
                 .jsonPath("$").isArray()
                 .jsonPath("$.length()").isEqualTo(1)
                 .jsonPath("$[0].id").isEqualTo(id)
-                .jsonPath("$[0].first").isEqualTo(SOME_FIRST_NAME)
-                .jsonPath("$[0].last").isEqualTo(SOME_LAST_NAME)
+                .jsonPath("$[0].firstName").isEqualTo(SOME_FIRST_NAME)
+                .jsonPath("$[0].lastName").isEqualTo(SOME_LAST_NAME)
                 .consumeWith(document("list",
                         responseFields(
                                 fieldWithPath("[]").description("All stored person entries")
                         ).andWithPrefix("[].", PERSON_DESCRIPTOR)
                 ));
+
+        // Try update a person with a null firstName/lastName
+        webTestClient.put()
+                .uri("/person/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                    {
+                        "firstName": "%s",
+                        "lastName": null
+                    }""".formatted(OTHER_FIRST_NAME))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.lastName").value(
+                value -> assertThat((String)value).contains("must not be null"));
 
         // Update
         webTestClient.put()
@@ -145,8 +171,8 @@ public class PersonApiTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "first": "%s",
-                          "last": "%s"
+                          "firstName": "%s",
+                          "lastName": "%s"
                         }
                         """.formatted(OTHER_FIRST_NAME, OTHER_LAST_NAME))
                 .exchange()
@@ -154,13 +180,13 @@ public class PersonApiTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(id)
-                .jsonPath("$.first").isEqualTo(OTHER_FIRST_NAME)
-                .jsonPath("$.last").isEqualTo(OTHER_LAST_NAME)
+                .jsonPath("$.firstName").isEqualTo(OTHER_FIRST_NAME)
+                .jsonPath("$.lastName").isEqualTo(OTHER_LAST_NAME)
                 .consumeWith(document("update",
                         ID_PATH_PARAMETERS_DESCRIPTOR,
                         requestFields(
-                                fieldWithPath("first").description("New first name of the person"),
-                                fieldWithPath("last").description("New last name of the person")
+                                fieldWithPath("firstName").description("New first name of the person"),
+                                fieldWithPath("lastName").description("New last name of the person")
                         ),
                         responseFields(PERSON_DESCRIPTOR)
                 ));
@@ -171,8 +197,8 @@ public class PersonApiTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "first": "%s",
-                          "last": "%s"
+                          "firstName": "%s",
+                          "lastName": "%s"
                         }
                         """.formatted(SOME_FIRST_NAME, SOME_LAST_NAME))
                 .exchange()

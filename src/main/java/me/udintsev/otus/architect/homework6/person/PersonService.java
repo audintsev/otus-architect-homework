@@ -13,20 +13,25 @@ public class PersonService {
     private final DatabaseClient databaseClient;
 
     private static final String TABLE_NAME = "person";
+    private static final String COL_ID = "id";
+    private static final String COL_FIRST_NAME = "first_name";
+    private static final String COL_LAST_NAME = "last_name";
+
     private static final Function<Row, Person> MAPPER = row -> new Person(
-            row.get("id", Long.class),
-            row.get("first", String.class),
-            row.get("last", String.class)
+            row.get(COL_ID, Long.class),
+            row.get(COL_FIRST_NAME, String.class),
+            row.get(COL_LAST_NAME, String.class)
     );
 
-    private static final String SELECT_BASE = "SELECT id, first, last from %s".formatted(TABLE_NAME);
+    private static final String SELECT_BASE = "SELECT %s, %s, %s from %s".formatted(
+            COL_ID, COL_FIRST_NAME, COL_LAST_NAME, TABLE_NAME);
 
     public PersonService(DatabaseClient databaseClient) {
         this.databaseClient = databaseClient;
     }
 
     public Mono<Person> get(long id) {
-        return databaseClient.sql("%s where id=:id".formatted(SELECT_BASE))
+        return databaseClient.sql("%s where %s=:id".formatted(SELECT_BASE, COL_ID))
                 .bind("id", id)
                 .map(MAPPER)
                 .one();
@@ -39,7 +44,8 @@ public class PersonService {
     }
 
     public Mono<Person> create(String first, String last) {
-        return databaseClient.sql("INSERT INTO %s (first, last) VALUES (:first, :last)".formatted(TABLE_NAME))
+        return databaseClient.sql("INSERT INTO %s (%s, %s) VALUES (:first, :last)".formatted(
+                TABLE_NAME, COL_FIRST_NAME, COL_LAST_NAME))
                 .filter(statement -> statement.returnGeneratedValues("id"))
                 .bind("first", first)
                 .bind("last", last)
@@ -48,7 +54,8 @@ public class PersonService {
     }
 
     public Mono<Person> update(long id, String first, String last) {
-        return databaseClient.sql("UPDATE %s SET first=:first, last=:last WHERE id=:id".formatted(TABLE_NAME))
+        return databaseClient.sql("UPDATE %s SET %s=:first, %s=:last WHERE %s=:id".formatted(
+                TABLE_NAME, COL_FIRST_NAME, COL_LAST_NAME, COL_ID))
                 .bind("id", id)
                 .bind("first", first)
                 .bind("last", last)
@@ -60,7 +67,7 @@ public class PersonService {
     }
 
     public Mono<Void> delete(long id) {
-        return databaseClient.sql("DELETE FROM %s WHERE id=:id".formatted(TABLE_NAME))
+        return databaseClient.sql("DELETE FROM %s WHERE %s=:id".formatted(TABLE_NAME, COL_ID))
                 .bind("id", id)
                 .then();
     }

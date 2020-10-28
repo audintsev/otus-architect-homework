@@ -5,6 +5,6 @@ import lombok.Value;
 @Value
 public class Person {
     Long id;
-    String first;
-    String last;
+    String firstName;
+    String lastName;
 }

@@ -16,12 +16,12 @@ class PersonServiceTest {
     PersonService personService;
 
     @Test
-    void insertAndList() {
+    void createAndList() {
         Consumer<Person> person1Verifier = person -> {
             assertThat(person).isNotNull();
             assertThat(person.getId()).isNotNull();
-            assertThat(person.getFirst()).isEqualTo("SomeFirst");
-            assertThat(person.getLast()).isEqualTo("SomeLast");
+            assertThat(person.getFirstName()).isEqualTo("SomeFirst");
+            assertThat(person.getLastName()).isEqualTo("SomeLast");
         };
         personService.create("SomeFirst", "SomeLast").as(StepVerifier::create)
                 .assertNext(person1Verifier)
@@ -30,8 +30,8 @@ class PersonServiceTest {
         Consumer<Person> person2Verifier = person -> {
             assertThat(person).isNotNull();
             assertThat(person.getId()).isNotNull();
-            assertThat(person.getFirst()).isEqualTo("AnotherFirst");
-            assertThat(person.getLast()).isEqualTo("AnotherLast");
+            assertThat(person.getFirstName()).isEqualTo("AnotherFirst");
+            assertThat(person.getLastName()).isEqualTo("AnotherLast");
         };
         personService.create("AnotherFirst", "AnotherLast").as(StepVerifier::create)
                 .assertNext(person2Verifier)
