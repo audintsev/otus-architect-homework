@@ -32,7 +32,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"first\": \"Vasily\",\r\n    \"last\": \"Pupkin\"\r\n}\r\n"
+					"raw": "{\r\n    \"firstName\": \"Vasily\",\r\n    \"lastName\": \"Pupkin\"\r\n}\r\n"
 				},
 				"url": {
 					"raw": "{{baseUrl}}{{pathPrefix}}/person",
@@ -106,7 +106,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"first\": \"Pupka\",\r\n    \"last\": \"Vasiliev\"\r\n}\r\n"
+					"raw": "{\r\n    \"firstName\": \"Pupka\",\r\n    \"lastName\": \"Vasiliev\"\r\n}\r\n"
 				},
 				"url": {
 					"raw": "{{baseUrl}}{{pathPrefix}}/person/{{id}}",
@@ -164,17 +164,17 @@
 	],
 	"variable": [
 		{
-			"id": "bf87fa09-4299-4e6a-b813-cdae80a7d7d4",
+			"id": "04647206-f89a-44cf-9557-7892db724451",
 			"key": "baseUrl",
 			"value": "http://arch.homework"
 		},
 		{
-			"id": "b01c40ed-47ad-4cca-aa2f-ee92e459c73a",
+			"id": "a23fca61-2249-4d9b-bb5f-823bccec1db0",
 			"key": "pathPrefix",
 			"value": "/otusapp/audintsev"
 		},
 		{
-			"id": "fe71fca2-e9ae-4ee5-815a-235c5b30759e",
+			"id": "243c6e0b-d88b-4e65-a353-7d584b27da3c",
 			"key": "id",
 			"value": ""
 		}
