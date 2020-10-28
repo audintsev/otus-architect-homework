@@ -8,12 +8,16 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.lang.Nullable;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.request.PathParametersSnippet;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -51,6 +55,18 @@ public class PersonApiTest {
     @Autowired
     PersonService personService;
 
+    String requestBody(@Nullable String firstName, @Nullable String lastName) {
+        var props = Stream.of(new AbstractMap.SimpleImmutableEntry<>("firstName", firstName),
+                new AbstractMap.SimpleImmutableEntry<>("lastName", lastName))
+                .filter(e -> e.getValue() != null)
+                .map(e -> String.format("  \"%s\": \"%s\"", e.getKey(), e.getValue()))
+                .collect(Collectors.joining(",\n"));
+
+        return "{\n" +
+                props +
+                "}";
+    }
+
     @Test
     void createAndList() {
         // Try create a person with no firstName/lastName
@@ -63,9 +79,9 @@ public class PersonApiTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.firstName").value(
-                value -> assertThat((String)value).contains("must not be null"))
+                value -> assertThat((String) value).contains("must not be null"))
                 .jsonPath("$.lastName").value(
-                value -> assertThat((String)value).contains("must not be null"));
+                value -> assertThat((String) value).contains("must not be null"));
 
         long id;
 
@@ -76,12 +92,7 @@ public class PersonApiTest {
             webTestClient.post()
                     .uri("/person")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue("""
-                            {
-                              "firstName": "%s",
-                              "lastName": "%s"
-                            }
-                            """.formatted(SOME_FIRST_NAME, SOME_LAST_NAME))
+                    .bodyValue(requestBody(SOME_FIRST_NAME, SOME_LAST_NAME))
                     .exchange()
                     .expectStatus().isCreated()
                     .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -153,28 +164,19 @@ public class PersonApiTest {
         webTestClient.put()
                 .uri("/person/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                    {
-                        "firstName": "%s",
-                        "lastName": null
-                    }""".formatted(OTHER_FIRST_NAME))
+                .bodyValue(requestBody(OTHER_FIRST_NAME, null))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.lastName").value(
-                value -> assertThat((String)value).contains("must not be null"));
+                value -> assertThat((String) value).contains("must not be null"));
 
         // Update
         webTestClient.put()
                 .uri("/person/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "firstName": "%s",
-                          "lastName": "%s"
-                        }
-                        """.formatted(OTHER_FIRST_NAME, OTHER_LAST_NAME))
+                .bodyValue(requestBody(OTHER_FIRST_NAME, OTHER_LAST_NAME))
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -195,12 +197,7 @@ public class PersonApiTest {
         webTestClient.put()
                 .uri("/person/{id}", nonExistingId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "firstName": "%s",
-                          "lastName": "%s"
-                        }
-                        """.formatted(SOME_FIRST_NAME, SOME_LAST_NAME))
+                .bodyValue(requestBody(SOME_FIRST_NAME, SOME_LAST_NAME))
                 .exchange()
                 .expectStatus().isNotFound();
 

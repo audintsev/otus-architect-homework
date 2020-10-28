@@ -16,14 +16,13 @@ import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Component
 @Transactional(readOnly = true)
 public class PersonHandler {
     public static final String URI_BASE = "/person";
-    public static final String URI_WITH_ID = "%s/{%s}".formatted(PersonHandler.URI_BASE, PersonHandler.PATH_VARIABLE_ID);
+    public static final String URI_WITH_ID = String.format("%s/{%s}", PersonHandler.URI_BASE, PersonHandler.PATH_VARIABLE_ID);
     public static final String PATH_VARIABLE_ID = "id";
 
     private final Validator validator;

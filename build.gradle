@@ -7,7 +7,7 @@ plugins {
 
 group = 'me.udintsev.otus.architect'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '15'
+sourceCompatibility = '11'
 
 configurations {
     compileOnly {
@@ -30,6 +30,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework:spring-r2dbc'
+    implementation 'org.springframework.experimental:spring-graalvm-native:0.8.1'
     implementation 'org.hibernate.validator:hibernate-validator'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
@@ -73,4 +74,12 @@ bootJar {
 //    from ("${asciidoctor.outputDir}/html5") {
 //        into 'META-INF/resources/docs'
 //    }
+}
+
+bootBuildImage {
+    builder = "paketobuildpacks/builder:tiny"
+    environment = [
+            "BP_BOOT_NATIVE_IMAGE" : "1",
+            "BP_BOOT_NATIVE_IMAGE_BUILD_ARGUMENTS": "-Dspring.spel.ignore=true"
+    ]
 }

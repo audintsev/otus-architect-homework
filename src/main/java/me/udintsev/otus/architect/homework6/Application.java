@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 @EnableWebFlux
 @EnableTransactionManagement
 public class Application {
