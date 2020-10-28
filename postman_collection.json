@@ -1,0 +1,183 @@
+{
+	"info": {
+		"_postman_id": "b554a1d8-b8b7-4d69-b06f-1f6adf87f857",
+		"name": "OTUS Architect Homework6",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create a person",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "12dd74e4-ddb9-4f72-abbd-1259e38591db",
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)\r",
+							"pm.collectionVariables.set(\"id\", responseJSON[\"id\"])\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first\": \"Vasily\",\r\n    \"last\": \"Pupkin\"\r\n}\r\n"
+				},
+				"url": {
+					"raw": "{{baseUrl}}{{pathPrefix}}/person",
+					"host": [
+						"{{baseUrl}}{{pathPrefix}}"
+					],
+					"path": [
+						"person"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List people",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}{{pathPrefix}}/person",
+					"host": [
+						"{{baseUrl}}{{pathPrefix}}"
+					],
+					"path": [
+						"person"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a person",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}{{pathPrefix}}/person/{{id}}",
+					"host": [
+						"{{baseUrl}}{{pathPrefix}}"
+					],
+					"path": [
+						"person",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a person",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cf714bb5-a47a-4cb6-bfb6-242d338090fb",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first\": \"Pupka\",\r\n    \"last\": \"Vasiliev\"\r\n}\r\n"
+				},
+				"url": {
+					"raw": "{{baseUrl}}{{pathPrefix}}/person/{{id}}",
+					"host": [
+						"{{baseUrl}}{{pathPrefix}}"
+					],
+					"path": [
+						"person",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a person",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}{{pathPrefix}}/person/{{id}}",
+					"host": [
+						"{{baseUrl}}{{pathPrefix}}"
+					],
+					"path": [
+						"person",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "239fcf46-1815-46a4-b579-03c2a1e488aa",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "cd8019a8-c7cb-4f54-a0a4-a984e67e4bca",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "bf87fa09-4299-4e6a-b813-cdae80a7d7d4",
+			"key": "baseUrl",
+			"value": "http://arch.homework"
+		},
+		{
+			"id": "b01c40ed-47ad-4cca-aa2f-ee92e459c73a",
+			"key": "pathPrefix",
+			"value": "/otusapp/audintsev"
+		},
+		{
+			"id": "fe71fca2-e9ae-4ee5-815a-235c5b30759e",
+			"key": "id",
+			"value": ""
+		}
+	],
+	"protocolProfileBehavior": {}
+}
