@@ -1,5 +1,10 @@
 server:
   shutdown: graceful
+spring:
+  r2dbc:
+    pool:
+      validation-depth: remote
+      validation-query: SELECT 1
 #management:
 #  endpoints:
 #    web:
