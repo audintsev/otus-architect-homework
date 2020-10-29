@@ -37,7 +37,8 @@ Optionally, to delete also PVC: `kubectl get pvc`, followed by: `kubectl delete 
 
 ## Invoking the postman collection
 
-`cd` to the root of the cloned repo, and then:
+After deploying, wait till `http://arch.homework/otusapp/audintsev/actuator/health/readiness`
+starts to report readiness and then `cd` to the root of the cloned repo and execute:
 ```
 newman run postman_collection.json 
 ```
