@@ -15,6 +15,7 @@ spec:
       containers:
         - name: app
           image: udintsev/otus-architect-homework6:0.1
+          imagePullPolicy: Always
           ports:
             - name: web
               containerPort: 8080
