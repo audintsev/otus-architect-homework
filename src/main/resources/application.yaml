@@ -4,7 +4,7 @@ spring:
   r2dbc:
     pool:
       validation-depth: remote
-      validation-query: SELECT 1
+      validation-query: "select 1 from person"
 #management:
 #  endpoints:
 #    web:
