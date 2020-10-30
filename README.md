@@ -104,8 +104,6 @@ one and the new one - co-exist in the same deployment.
 and use the new stuff from Soring 5.3. But at the time of this writing Spring Framework 5.3 is still only available as
 a milestone release (as a dependency of a milestone release of Spring Boot 2.4). That's how I ended up using pre-release
 versions of Spring.
-* Even though API documentation _is_ generated, Boot difficulties serving it (as embedded static content), perhaps
-due to the pre-release Boot version being used
 
 ### App: building and running
 

@@ -5,8 +5,7 @@ spring:
     pool:
       validation-depth: remote
       validation-query: "select 1 from person"
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
+management:
+  health:
+    db:
+      enabled: true
