@@ -84,9 +84,6 @@ TODO (?):
 
 * Building native image
 * CI with Github actions (possibly publishing generated API docs as a Github pages site)
-* Spring Framework 5.3 [has been released](https://spring.io/blog/2020/10/27/spring-framework-5-3-goes-ga)
-  on October 27, and [Boot 2.4.0-RC1 is due by October 29](https://github.com/spring-projects/spring-boot/milestones)
-  -> update dependencies.
   
 Comments:
 
@@ -100,10 +97,9 @@ microservices/cloud native world: with app-managed migrations an application typ
 version doesn't match what application expects; but that's exactly what seems to happen more often than not:
 a new application version makes some additions to the schema (e.g. a new column), and the two versions - the old
 one and the new one - co-exist in the same deployment. 
-* A lot of R2DBC foundation stuff is being moved from Spring Data R2DBC to Spring Framework 5.3. I decided to go ahead
-and use the new stuff from Soring 5.3. But at the time of this writing Spring Framework 5.3 is still only available as
-a milestone release (as a dependency of a milestone release of Spring Boot 2.4). That's how I ended up using pre-release
-versions of Spring.
+* A lot of R2DBC foundation stuff has being moved from Spring Data R2DBC to Spring Framework 5.3. I decided to go ahead
+and use the new stuff from Soring 5.3. But at the time of this writing only a pre-release version of Spring Boot (2.4-RC1)
+uses Spring Framework 5.3. That's how I ended up using pre-release versions of Spring Boot.
 
 ### App: building and running
 
