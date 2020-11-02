@@ -6,6 +6,14 @@ spring:
       validation-depth: remote
       validation-query: "select 1 from person"
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus,metrics"
   health:
     db:
       enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true

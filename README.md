@@ -118,8 +118,8 @@ java -jar otus-architect-homework6-0.0.1-SNAPSHOT.jar --spring.r2dbc.url=r2dbc:p
 ### Image: building and pushing
 
 ```
-./gradlew bootBuildImage --imageName=udintsev/otus-architect-homework6:0.1
-docker push udintsev/otus-architect-homework6:0.1
+./gradlew bootBuildImage --imageName=udintsev/otus-architect-homework6:0.2
+docker push udintsev/otus-architect-homework6:0.2
 ```
 
 ### Useful links
@@ -128,3 +128,27 @@ docker push udintsev/otus-architect-homework6:0.1
 * [WebFllux on Spring Framework](https://docs.spring.io/spring-framework/docs/5.3.0-RC2/reference/html/web-reactive.html#spring-webflux)
 * [R2DBC support in Testcontainers](https://www.testcontainers.org/modules/databases/r2dbc/)
 * [Spring REST Docs](https://docs.spring.io/spring-restdocs/docs/current/reference/html5/) 
+
+## Gathering pod metrics for CPU and memory usage
+
+https://prometheus.io/docs/guides/cadvisor/
+
+
+[Prometheus stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
+installs [stable/kube-state-metrics](https://github.com/helm/charts/tree/master/stable/kube-state-metrics) and
+[stable/prometheus-node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter)
+
+https://coreos.com/blog/monitoring-kubernetes-with-prometheus.html
+https://itnext.io/k8s-monitor-pod-cpu-and-memory-usage-with-prometheus-28eec6d84729
+https://github.com/kubernetes/kube-state-metrics/blob/master/docs/pod-metrics.md
+
+## Gathering Postgres metrics
+
+https://github.com/bitnami/charts/tree/master/bitnami/postgresql#metrics
+
+Postgres exporter for Prometheus
+
+https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-postgres-exporter
+https://github.com/wrouesnel/postgres_exporter
+https://habr.com/ru/post/480902/
+

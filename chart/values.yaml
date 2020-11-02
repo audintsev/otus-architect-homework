@@ -11,6 +11,10 @@ ingress:
   host: arch.homework
   pathPrefix: /otusapp/audintsev
 
+metrics:
+  serviceMonitor:
+    enabled: true
+
 postgresql:
   enabled: true
   postgresqlUsername: myuser
@@ -18,3 +22,8 @@ postgresql:
   postgresqlDatabase: myapp
   service:
     port: "5432"
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      interval: 15s
