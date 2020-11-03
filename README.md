@@ -131,24 +131,40 @@ docker push udintsev/otus-architect-homework6:0.2
 
 ## Gathering pod metrics for CPU and memory usage
 
-https://prometheus.io/docs/guides/cadvisor/
+Container metrics can be provided by [cAdvisor](https://github.com/google/cadvisor),
+available metrics are documented [here](https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md).
 
+Prometheus has a corresponding [guide](https://prometheus.io/docs/guides/cadvisor/)
 
-[Prometheus stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
-installs [stable/kube-state-metrics](https://github.com/helm/charts/tree/master/stable/kube-state-metrics) and
-[stable/prometheus-node-exporter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-node-exporter)
+When using [prometheus stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack),
+collecting container metrics is enabled out of the box.
 
-https://coreos.com/blog/monitoring-kubernetes-with-prometheus.html
-https://itnext.io/k8s-monitor-pod-cpu-and-memory-usage-with-prometheus-28eec6d84729
-https://github.com/kubernetes/kube-state-metrics/blob/master/docs/pod-metrics.md
+Some further links:
+* https://coreos.com/blog/monitoring-kubernetes-with-prometheus.html
+* https://itnext.io/k8s-monitor-pod-cpu-and-memory-usage-with-prometheus-28eec6d84729
+* https://github.com/kubernetes/kube-state-metrics/blob/master/docs/pod-metrics.md
 
 ## Gathering Postgres metrics
 
-https://github.com/bitnami/charts/tree/master/bitnami/postgresql#metrics
+[Postgres exporter](https://github.com/wrouesnel/postgres_exporter) can be used to export metrics.
 
-Postgres exporter for Prometheus
+There is a [helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-postgres-exporter)
+for prometheus to install the exporter.
 
-https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-postgres-exporter
-https://github.com/wrouesnel/postgres_exporter
-https://habr.com/ru/post/480902/
+We're using a bitnami chart to install postgresql, and this chart can also
+[enable the exporter](https://github.com/bitnami/charts/tree/master/bitnami/postgresql#metrics),
+we only need to add this to [values.yaml](chart/values.yaml):
 
+```yaml
+postgresql:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      interval: 15s
+```
+
+The exporter exposes internal DB views, so available
+metrics are essentially documented [here](https://www.postgresql.org/docs/9.2/monitoring-stats.html)
+
+[Sample Grafana dashboard](https://grafana.com/grafana/dashboards/9628)

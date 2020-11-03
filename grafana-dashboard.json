@@ -25,7 +25,7 @@
           {
             "evaluator": {
               "params": [
-                10
+                100
               ],
               "type": "gt"
             },
@@ -35,13 +35,13 @@
             "query": {
               "params": [
                 "A",
-                "5m",
+                "1m",
                 "now"
               ]
             },
             "reducer": {
               "params": [],
-              "type": "avg"
+              "type": "sum"
             },
             "type": "query"
           }
@@ -74,7 +74,7 @@
         "y": 0
       },
       "hiddenSeries": false,
-      "id": 8,
+      "id": 26,
       "legend": {
         "avg": false,
         "current": false,
@@ -103,7 +103,7 @@
         {
           "expr": "rate(nginx_ingress_controller_request_duration_seconds_count{path=\"/otusapp/audintsev($|/)(.*)\", status =~ \"5..\"}[1m])",
           "interval": "",
-          "legendFormat": "5xx rate",
+          "legendFormat": "{{status}}",
           "refId": "A"
         }
       ],
@@ -113,7 +113,7 @@
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 10
+          "value": 100
         }
       ],
       "timeFrom": null,
@@ -258,7 +258,7 @@
           {
             "evaluator": {
               "params": [
-                30
+                50
               ],
               "type": "gt"
             },
@@ -304,11 +304,11 @@
       "gridPos": {
         "h": 8,
         "w": 5,
-        "x": 15,
+        "x": 10,
         "y": 0
       },
       "hiddenSeries": false,
-      "id": 4,
+      "id": 23,
       "legend": {
         "avg": false,
         "current": false,
@@ -365,13 +365,132 @@
           "fill": true,
           "line": true,
           "op": "gt",
-          "value": 30
+          "value": 50
         }
       ],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
       "title": "NGINX Latency GET, ms",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 15,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 20,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.2.1",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum(rate(pg_stat_database_tup_returned{datname = \"myapp\"}[1m]))",
+          "interval": "",
+          "legendFormat": "Returned",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(pg_stat_database_tup_fetched{datname = \"myapp\"}[1m]))",
+          "interval": "",
+          "legendFormat": "Fetched",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(rate(pg_stat_database_tup_inserted{datname = \"myapp\"}[1m]))",
+          "interval": "",
+          "legendFormat": "Inserted",
+          "refId": "C"
+        },
+        {
+          "expr": "sum(rate(pg_stat_database_tup_updated{datname = \"myapp\"}[1m]))",
+          "interval": "",
+          "legendFormat": "Updated",
+          "refId": "D"
+        },
+        {
+          "expr": "sum(rate(pg_stat_database_tup_deleted{datname = \"myapp\"}[1m]))",
+          "interval": "",
+          "legendFormat": "Deleted",
+          "refId": "E"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "DB: tuples per sec",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -456,9 +575,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (method, uri) (rate(http_server_requests_seconds_count{service =~\".*homework.*\", uri !~ \"/actuator.*\", status =~ \"5..\" }[1m]))",
+          "expr": "sum by (method, uri, status) (rate(http_server_requests_seconds_count{service =~\".*homework.*\", uri !~ \"/actuator.*\", status =~ \"5..\" }[1m]))",
           "interval": "",
-          "legendFormat": "{{method}} {{uri}}",
+          "legendFormat": "{{method}} {{uri}} {{status}}",
           "refId": "A"
         }
       ],
@@ -617,7 +736,7 @@
       "gridPos": {
         "h": 8,
         "w": 5,
-        "x": 15,
+        "x": 10,
         "y": 8
       },
       "hiddenSeries": false,
@@ -730,11 +849,11 @@
       "gridPos": {
         "h": 8,
         "w": 5,
-        "x": 0,
-        "y": 16
+        "x": 15,
+        "y": 8
       },
       "hiddenSeries": false,
-      "id": 17,
+      "id": 24,
       "legend": {
         "avg": false,
         "current": false,
@@ -761,9 +880,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "container_memory_usage_bytes{image =~ \"udintsev.*\"} / 1024 / 1024",
+          "expr": "sum(pg_stat_database_blks_hit{datname=~\"myapp\"}) / sum(pg_stat_database_blks_read{datname=~\"myapp\"} + pg_stat_database_blks_hit{datname=~\"myapp\"})",
           "interval": "",
-          "legendFormat": "{{pod}}",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -771,7 +890,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "RAM utilization, MB",
+      "title": "DB: cache hit rate",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -820,7 +939,102 @@
         },
         "overrides": []
       },
-      "fill": 1,
+      "fill": 10,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 0,
+        "y": 16
+      },
+      "hiddenSeries": false,
+      "id": 22,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 0,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.2.1",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum by (pod) (container_memory_working_set_bytes{namespace=\"myapp\", container!=\"\", image!=\"\"})",
+          "interval": "",
+          "legendFormat": "{{pod}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "RAM usage w/o cache",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 10,
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
@@ -829,7 +1043,7 @@
         "y": 16
       },
       "hiddenSeries": false,
-      "id": 18,
+      "id": 21,
       "legend": {
         "avg": false,
         "current": false,
@@ -840,7 +1054,7 @@
         "values": false
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 0,
       "nullPointMode": "null",
       "options": {
         "alertThreshold": true
@@ -852,11 +1066,11 @@
       "renderer": "flot",
       "seriesOverrides": [],
       "spaceLength": 10,
-      "stack": false,
+      "stack": true,
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(container_cpu_usage_seconds_total{image =~ \"udintsev/.*\"}[1m]) * 100",
+          "expr": "sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate{namespace=\"myapp\"}) by (pod)",
           "interval": "",
           "legendFormat": "{{pod}}",
           "refId": "A"
@@ -866,7 +1080,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "CPU utilization, %",
+      "title": "CPU usage",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -886,7 +1100,7 @@
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
@@ -920,7 +1134,7 @@
       "gridPos": {
         "h": 8,
         "w": 5,
-        "x": 15,
+        "x": 10,
         "y": 16
       },
       "hiddenSeries": false,
@@ -1009,6 +1223,101 @@
         "align": false,
         "alignLevel": null
       }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 15,
+        "y": 16
+      },
+      "hiddenSeries": false,
+      "id": 25,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.2.1",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum(pg_stat_activity_count{datname=~\"myapp\", state=\"active\"})",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "DB: active sessions",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     }
   ],
   "refresh": "5s",
@@ -1026,5 +1335,5 @@
   "timezone": "",
   "title": "MyApp",
   "uid": "DSve_VhGk",
-  "version": 15
+  "version": 24
 }
