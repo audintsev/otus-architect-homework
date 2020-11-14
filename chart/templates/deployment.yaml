@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "udintsev-hw-chart.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "udintsev-hw-chart.labels" . | nindent 4 }}
 spec:
@@ -29,6 +30,9 @@ spec:
                 name: "{{ printf "%s-app" (include "udintsev-hw-chart.fullname" .) }}"
             - secretRef:
                 name: "{{ printf "%s-app" (include "udintsev-hw-chart.fullname" .) }}"
+          env:
+            - name: spring.security.oauth2.resourceserver.jwt.issuer-uri
+              value: "{{ print "%s%s/auth" .Values.ingress.host .Values.ingress.pathPrefix }}"
           livenessProbe:
             httpGet:
               port: 8080

@@ -14,3 +14,9 @@ dependencies:
     condition: postgresql.enabled
     tags:
       - hw-database
+  - name: keycloak
+    version: 0.1.x
+    repository: https://charts.bitnami.com/bitnami
+    condition: keycloak.enabled
+    tags:
+      - hw-idp

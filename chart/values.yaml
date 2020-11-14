@@ -17,6 +17,7 @@ metrics:
 
 postgresql:
   enabled: true
+  nameOverride: app-db
   postgresqlUsername: myuser
   postgresqlPassword: passwd
   postgresqlDatabase: myapp
@@ -27,3 +28,17 @@ postgresql:
     serviceMonitor:
       enabled: false
       interval: 15s
+
+keycloak:
+  enabled: true
+  postgresql:
+    nameOverride: keycloak-db
+  auth:
+    createAdminUser: true
+    adminUser: admin
+    adminPassword: admin
+  service:
+    type: ClusterIP
+  args:
+    - "/opt/bitnami/scripts/keycloak/run.sh"
+    - "-Dkeycloak.frontendUrl=http://arch.homework/otusapp/audintsev/auth"

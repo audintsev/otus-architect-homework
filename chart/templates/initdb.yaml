@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: "{{ .Release.Name }}"
+  namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -28,7 +29,7 @@ spec:
           image: postgres:latest
           env:
             - name: POSTGRES_HOST
-              value: {{ include "postgresql.fullname" . | quote }}
+              value: {{ include "udintsev-hw-chart.dbFullname" . | quote }}
             - name: POSTGRES_PORT
               value: {{ .Values.postgresql.service.port | quote }}
           command:
@@ -41,7 +42,7 @@ spec:
       - name: post-install-job
         env:
           - name: DATABASE_URI
-            value: {{ printf "postgresql://%s:%s@%s:%s/%s" .Values.postgresql.postgresqlUsername .Values.postgresql.postgresqlPassword (include "postgresql.fullname" .) .Values.postgresql.service.port .Values.postgresql.postgresqlDatabase  | quote }}
+            value: {{ printf "postgresql://%s:%s@%s:%s/%s" .Values.postgresql.postgresqlUsername .Values.postgresql.postgresqlPassword (include "udintsev-hw-chart.dbFullname" .) .Values.postgresql.service.port .Values.postgresql.postgresqlDatabase  | quote }}
         image: postgres:latest
         command:
           - sh

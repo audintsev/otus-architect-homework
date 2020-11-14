@@ -51,6 +51,35 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 
-{{- define "postgresql.fullname" -}}
-{{- printf "%s-%s" .Release.Name "postgresql" | trunc 63 | trimSuffix "-" }}
+{{- define "udintsev-hw-chart.dbFullname" -}}
+{{- if .Values.postgresql.fullnameOverride -}}
+{{- .Values.postgresql.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default "postgres" .Values.postgresql.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
 {{- end }}
+
+{{- define "udintsev-hw-chart.keycloakFullname" -}}
+{{- if .Values.keycloak.fullnameOverride -}}
+{{- .Values.keycloak.fullnameOverride | trunc 20 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default "keycloak" .Values.keycloak.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 20 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 20 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Override keycloak DB name defined in the keycloak chart
+*/}}
+{{- define "keycloak.postgresql.fullname" -}}
+{{- printf "%s-%s" .Release.Name .Values.postgresql.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}

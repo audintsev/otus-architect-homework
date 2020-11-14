@@ -3,6 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ include "udintsev-hw-chart.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "udintsev-hw-chart.labels" . | nindent 4 }}
 spec:
