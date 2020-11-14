@@ -1,6 +1,6 @@
-package me.udintsev.otus.architect.homework6;
+package me.udintsev.otus.architect.hw;
 
-import me.udintsev.otus.architect.homework6.person.PersonHandler;
+import me.udintsev.otus.architect.hw.person.PersonHandler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;

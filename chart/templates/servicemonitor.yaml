@@ -2,17 +2,17 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "homework6-chart.fullname" . }}
+  name: {{ include "udintsev-hw-chart.fullname" . }}
   labels:
-    {{- include "homework6-chart.labels" . | nindent 4 }}
+    {{- include "udintsev-hw-chart.labels" . | nindent 4 }}
 spec:
-  jobLabel: {{ include "homework6-chart.fullname" . }}
+  jobLabel: {{ include "udintsev-hw-chart.fullname" . }}
   namespaceSelector:
     matchNames:
     - "{{ $.Release.Namespace }}"
   selector:
     matchLabels:
-      {{- include "homework6-chart.selectorLabels" . | nindent 6 }}
+      {{- include "udintsev-hw-chart.selectorLabels" . | nindent 6 }}
   endpoints:
   - interval: 15s
     port: http

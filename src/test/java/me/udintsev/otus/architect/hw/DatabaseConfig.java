@@ -1,4 +1,4 @@
-package me.udintsev.otus.architect.homework6;
+package me.udintsev.otus.architect.hw;
 
 import io.r2dbc.postgresql.PostgresqlConnectionFactoryProvider;
 import io.r2dbc.spi.ConnectionFactory;

@@ -1,4 +1,4 @@
-package me.udintsev.otus.architect.homework6.person;
+package me.udintsev.otus.architect.hw.person;
 
 import lombok.Data;
 import org.springframework.http.MediaType;
@@ -16,7 +16,6 @@ import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Component

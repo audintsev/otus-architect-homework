@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "homework6-chart.fullname" . }}
+  name: {{ include "udintsev-hw-chart.fullname" . }}
   labels:
-    {{- include "homework6-chart.labels" . | nindent 4 }}
+    {{- include "udintsev-hw-chart.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "homework6-chart.selectorLabels" . | nindent 6 }}
+      {{- include "udintsev-hw-chart.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "homework6-chart.selectorLabels" . | nindent 8 }}
+        {{- include "udintsev-hw-chart.selectorLabels" . | nindent 8 }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
     spec:
@@ -26,13 +26,13 @@ spec:
               protocol: TCP
           envFrom:
             - configMapRef:
-                name: "{{ printf "%s-app" (include "homework6-chart.fullname" .) }}"
+                name: "{{ printf "%s-app" (include "udintsev-hw-chart.fullname" .) }}"
             - secretRef:
-                name: "{{ printf "%s-app" (include "homework6-chart.fullname" .) }}"
+                name: "{{ printf "%s-app" (include "udintsev-hw-chart.fullname" .) }}"
           livenessProbe:
             httpGet:
               port: 8080
-              path: /actuator/health/liveness
+              path: /actuator/health
             initialDelaySeconds: 10
             periodSeconds: 5
             timeoutSeconds: 2

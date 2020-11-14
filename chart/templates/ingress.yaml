@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ include "homework6-chart.fullname" . }}
+  name: {{ include "udintsev-hw-chart.fullname" . }}
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
@@ -12,5 +12,5 @@ spec:
         paths:
           - path: {{ printf "%s($|/)(.*)" .Values.ingress.pathPrefix }}
             backend:
-              serviceName: {{ include "homework6-chart.fullname" . }}
+              serviceName: {{ include "udintsev-hw-chart.fullname" . }}
               servicePort: http

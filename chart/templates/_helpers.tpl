@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "homework6-chart.name" -}}
+{{- define "udintsev-hw-chart.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "homework6-chart.fullname" -}}
+{{- define "udintsev-hw-chart.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "homework6-chart.chart" -}}
+{{- define "udintsev-hw-chart.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "homework6-chart.labels" -}}
-helm.sh/chart: {{ include "homework6-chart.chart" . }}
-{{ include "homework6-chart.selectorLabels" . }}
+{{- define "udintsev-hw-chart.labels" -}}
+helm.sh/chart: {{ include "udintsev-hw-chart.chart" . }}
+{{ include "udintsev-hw-chart.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,8 +45,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "homework6-chart.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "homework6-chart.name" . }}
+{{- define "udintsev-hw-chart.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "udintsev-hw-chart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 

@@ -1,4 +1,4 @@
-package me.udintsev.otus.architect.homework6;
+package me.udintsev.otus.architect.hw;
 
 import org.springframework.boot.test.autoconfigure.restdocs.RestDocsWebTestClientConfigurationCustomizer;
 import org.springframework.boot.test.context.TestConfiguration;

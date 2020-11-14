@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: udintsev/otus-architect-homework6
+  repository: udintsev/hw
 
 service:
   type: ClusterIP
@@ -13,7 +13,7 @@ ingress:
 
 metrics:
   serviceMonitor:
-    enabled: true
+    enabled: false
 
 postgresql:
   enabled: true
@@ -23,7 +23,7 @@ postgresql:
   service:
     port: "5432"
   metrics:
-    enabled: true
+    enabled: false
     serviceMonitor:
-      enabled: true
+      enabled: false
       interval: 15s

@@ -1,39 +1,21 @@
-# Homework for the lesson #6 (Kubernetes basics) of the [Otus "Software Architect" course](https://otus.ru/lessons/arhitektor-po/) 
+# Homework for lessons 6, 7 and 11 (see tags) of the [Otus "Software Architect" course](https://otus.ru/lessons/arhitektor-po/) 
 
 ## Deploying as Helm release
 
 Deploying:
 ```
-git clone https://github.com/audintsev/otus-architect-homework6.git
-cd otus-architect-homework6
-helm install homework6 ./chart
+git clone https://github.com/audintsev/otus-architect-homework.git
+cd otus-architect-homework
+helm install udintsev-hw ./chart
 ```
 
 Undeploying:
 ```
-helm uninstall homework6
+helm uninstall udintsev-hw
 ```
 
-Optionally, to delete also PVC: `kubectl get pvc`, followed by: `kubectl delete pvc data-homework6-postgresql-0`
+Optionally, to delete also PVC: `kubectl get pvc`, followed by: `kubectl delete pvc data-udintsev-hw-postgresql-0`
 
-## Deploying with manifests
-
-Deploying:
-```
-helm repo add bitnami https://charts.bitnami.com/bitnami
-git clone https://github.com/audintsev/otus-architect-homework6.git
-cd otus-architect-homework6/manifests
-helm install -f values.yaml postgres bitnami/postgresql
-kubectl apply -f manifests
-```
-
-Undeploying:
-```
-kubectl delete -f manifests
-helm delete postgres
-```
-
-Optionally, to delete also PVC: `kubectl get pvc`, followed by: `kubectl delete pvc data-postgres-postgresql-0`
 
 ## Invoking the postman collection
 
@@ -97,9 +79,6 @@ microservices/cloud native world: with app-managed migrations an application typ
 version doesn't match what application expects; but that's exactly what seems to happen more often than not:
 a new application version makes some additions to the schema (e.g. a new column), and the two versions - the old
 one and the new one - co-exist in the same deployment. 
-* A lot of R2DBC foundation stuff has being moved from Spring Data R2DBC to Spring Framework 5.3. I decided to go ahead
-and use the new stuff from Soring 5.3. But at the time of this writing only a pre-release version of Spring Boot (2.4-RC1)
-uses Spring Framework 5.3. That's how I ended up using pre-release versions of Spring Boot.
 
 ### App: building and running
 
@@ -112,14 +91,14 @@ Building:
 Running (assuming Postgres is available on localhost:5432):
 
 ```
-java -jar otus-architect-homework6-0.0.1-SNAPSHOT.jar --spring.r2dbc.url=r2dbc:postgresql://localhost/test --spring.r2dbc.username=test --spring.r2dbc.password=test
+java -jar otus-architect-homework-0.0.1-SNAPSHOT.jar --spring.r2dbc.url=r2dbc:postgresql://localhost/test --spring.r2dbc.username=test --spring.r2dbc.password=test
 ```
 
 ### Image: building and pushing
 
 ```
-./gradlew bootBuildImage --imageName=udintsev/otus-architect-homework6:0.2
-docker push udintsev/otus-architect-homework6:0.2
+./gradlew bootBuildImage --imageName=udintsev/hw:latest
+docker push udintsev/hw:latest
 ```
 
 ### Useful links

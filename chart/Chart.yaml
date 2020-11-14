@@ -1,11 +1,11 @@
 apiVersion: v2
-name: homework6
-description: OTUS architect course, homework6
+name: udintsev-hw
+description: OTUS architect course, homework
 
 type: application
 
 version: 0.1.2
-appVersion: "0.2"
+appVersion: "latest"
 
 dependencies:
   - name: postgresql
@@ -13,4 +13,4 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
     tags:
-      - homework6-database
+      - hw-database

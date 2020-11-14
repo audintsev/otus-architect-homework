@@ -1,6 +1,6 @@
-package me.udintsev.otus.architect.homework6.person;
+package me.udintsev.otus.architect.hw.person;
 
-import me.udintsev.otus.architect.homework6.DatabaseConfig;
+import me.udintsev.otus.architect.hw.DatabaseConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

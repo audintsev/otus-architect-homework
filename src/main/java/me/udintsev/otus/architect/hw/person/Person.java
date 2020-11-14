@@ -1,4 +1,4 @@
-package me.udintsev.otus.architect.homework6.person;
+package me.udintsev.otus.architect.hw.person;
 
 import lombok.Value;
 

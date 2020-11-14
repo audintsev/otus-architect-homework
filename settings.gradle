@@ -1,6 +1,5 @@
 pluginManagement {
     repositories {
-        maven { url 'https://repo.spring.io/milestone' }
         gradlePluginPortal()
     }
     resolutionStrategy {
@@ -11,4 +10,4 @@ pluginManagement {
         }
     }
 }
-rootProject.name = 'otus-architect-homework6'
+rootProject.name = 'otus-architect-homework'
