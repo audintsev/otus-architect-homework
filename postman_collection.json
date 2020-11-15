@@ -1,20 +1,20 @@
 {
 	"info": {
-		"_postman_id": "b554a1d8-b8b7-4d69-b06f-1f6adf87f857",
-		"name": "OTUS Architect Homework",
+		"_postman_id": "ee64de44-c911-470f-b46d-f380b794d9f5",
+		"name": "OTUS Architect Homework12",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Create a person",
+			"name": "Keycloak Admin login",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "12dd74e4-ddb9-4f72-abbd-1259e38591db",
+						"id": "cf23b4da-854d-4804-9064-4b01e5ddb587",
 						"exec": [
 							"var responseJSON = JSON.parse(responseBody)\r",
-							"pm.collectionVariables.set(\"id\", responseJSON[\"id\"])\r",
+							"pm.environment.set(\"adminAccessToken\", responseJSON[\"access_token\"]);\r",
 							""
 						],
 						"type": "text/javascript"
@@ -22,25 +22,457 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "admin-cli",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{keycloakAdminName}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{keycloakAdminPassword}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{keycloakUrl}}/realms/master/protocol/openid-connect/token",
+					"host": [
+						"{{keycloakUrl}}"
+					],
+					"path": [
+						"realms",
+						"master",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create realm",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f33cc068-4a8a-4dce-bb53-eafa17a85b58",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9e1d5d42-b250-4863-ac91-162f712d80a6",
+						"exec": [
+							"if (pm.variables.get('forceAdminLogin')) {\r",
+							"    const getAdminTokenRequest = {\r",
+							"    url: pm.variables.replaceIn(\"{{keycloakUrl}}\") + \"/realms/master/protocol/openid-connect/token\",\r",
+							"    method: 'POST',\r",
+							"    header: [\r",
+							"        'Content-Type:application/x-www-form-urlencoded',\r",
+							"        'Accept:application/json'\r",
+							"    ],\r",
+							"    body: {\r",
+							"        mode: 'urlencoded',\r",
+							"        urlencoded: [\r",
+							"            {key: \"client_id\", value: \"admin-cli\", disabled: false},\r",
+							"            {key: \"grant_type\", value: \"password\", disabled: false},\r",
+							"            {key: \"username\", value: pm.variables.get(\"keycloakAdminName\"), disabled: false},\r",
+							"            {key: \"password\", value: pm.variables.get(\"keycloakAdminPassword\"), disabled: false}\r",
+							"        ]\r",
+							"    }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(getAdminTokenRequest, function (err, response) {\r",
+							"        pm.environment.set(\"adminAccessToken\", response.json().access_token);\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Vasily\",\r\n    \"lastName\": \"Pupkin\"\r\n}\r\n"
+					"raw": "{\r\n    \"enabled\": true,\r\n    \"id\": \"{{realm}}\",\r\n    \"realm\": \"{{realm}}\",\r\n    \"registrationAllowed\": true,\r\n    \"registrationEmailAsUsername\": true,\r\n    \"sslRequired\": \"none\",\r\n    \"verifyEmail\": false\r\n}\r\n"
 				},
 				"url": {
-					"raw": "{{baseUrl}}{{pathPrefix}}/person",
+					"raw": "{{keycloakUrl}}/admin/realms",
 					"host": [
-						"{{baseUrl}}{{pathPrefix}}"
+						"{{keycloakUrl}}"
 					],
 					"path": [
-						"person"
+						"admin",
+						"realms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fd6336b9-fba9-4d1e-8bba-9202e6d773cf",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "20f02ecd-5703-44ce-ac58-ff3d94132ccf",
+						"exec": [
+							"if (pm.variables.get('forceAdminLogin')) {\r",
+							"    const getAdminTokenRequest = {\r",
+							"    url: pm.variables.replaceIn(\"{{keycloakUrl}}\") + \"/realms/master/protocol/openid-connect/token\",\r",
+							"    method: 'POST',\r",
+							"    header: [\r",
+							"        'Content-Type:application/x-www-form-urlencoded',\r",
+							"        'Accept:application/json'\r",
+							"    ],\r",
+							"    body: {\r",
+							"        mode: 'urlencoded',\r",
+							"        urlencoded: [\r",
+							"            {key: \"client_id\", value: \"admin-cli\", disabled: false},\r",
+							"            {key: \"grant_type\", value: \"password\", disabled: false},\r",
+							"            {key: \"username\", value: pm.variables.get(\"keycloakAdminName\"), disabled: false},\r",
+							"            {key: \"password\", value: pm.variables.get(\"keycloakAdminPassword\"), disabled: false}\r",
+							"        ]\r",
+							"    }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(getAdminTokenRequest, function (err, response) {\r",
+							"        pm.environment.set(\"adminAccessToken\", response.json().access_token);\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"enabled\": true,\r\n    \"attributes\": {},\r\n    \"redirectUris\": [],\r\n    \"clientId\":\"{{client}}\",\r\n    \"rootUrl\":\"{{baseUrl}}{{pathPrefix}}/app\",\r\n    \"protocol\":\"openid-connect\"\r\n}\r\n"
+				},
+				"url": {
+					"raw": "{{keycloakUrl}}/admin/realms/{{realm}}/clients",
+					"host": [
+						"{{keycloakUrl}}"
+					],
+					"path": [
+						"admin",
+						"realms",
+						"{{realm}}",
+						"clients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "513d395a-11de-4c78-8121-71cfa0dbe034",
+						"exec": [
+							"const locationHeader = pm.response.headers.get('Location')\r",
+							"const id = locationHeader.substring(locationHeader.lastIndexOf(\"/\") + 1)\r",
+							"pm.environment.set(\"userid1\", id)"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8f5aeedb-25e8-4898-8a65-06f95ebdfef1",
+						"exec": [
+							"if (pm.variables.get('forceAdminLogin')) {\r",
+							"    const getAdminTokenRequest = {\r",
+							"    url: pm.variables.replaceIn(\"{{keycloakUrl}}\") + \"/realms/master/protocol/openid-connect/token\",\r",
+							"    method: 'POST',\r",
+							"    header: [\r",
+							"        'Content-Type:application/x-www-form-urlencoded',\r",
+							"        'Accept:application/json'\r",
+							"    ],\r",
+							"    body: {\r",
+							"        mode: 'urlencoded',\r",
+							"        urlencoded: [\r",
+							"            {key: \"client_id\", value: \"admin-cli\", disabled: false},\r",
+							"            {key: \"grant_type\", value: \"password\", disabled: false},\r",
+							"            {key: \"username\", value: pm.variables.get(\"keycloakAdminName\"), disabled: false},\r",
+							"            {key: \"password\", value: pm.variables.get(\"keycloakAdminPassword\"), disabled: false}\r",
+							"        ]\r",
+							"    }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(getAdminTokenRequest, function (err, response) {\r",
+							"        pm.environment.set(\"adminAccessToken\", response.json().access_token);\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"pm.environment.set(\"email1\", pm.variables.replaceIn('{{$randomEmail}}'))\r",
+							"pm.variables.set(\"firstName\", pm.variables.replaceIn('{{$randomFirstName}}'))\r",
+							"pm.variables.set(\"lastName\", pm.variables.replaceIn('{{$randomLastName}}'))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"enabled\": true,\r\n    \"email\": \"{{email1}}\",\r\n    \"firstName\": \"{{firstName}}\",\r\n    \"lastName\": \"{{lastName}}\",\r\n    \"attributes\": {}\r\n}"
+				},
+				"url": {
+					"raw": "{{keycloakUrl}}/admin/realms/{{realm}}/users",
+					"host": [
+						"{{keycloakUrl}}"
+					],
+					"path": [
+						"admin",
+						"realms",
+						"{{realm}}",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set password for user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "392c965b-0d1e-4e90-8ed5-8cf2d0099d06",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1f7c717a-eb7a-4345-a1af-a85fedcc65a0",
+						"exec": [
+							"if (pm.variables.get('forceAdminLogin')) {\r",
+							"    const getAdminTokenRequest = {\r",
+							"    url: pm.variables.replaceIn(\"{{keycloakUrl}}\") + \"/realms/master/protocol/openid-connect/token\",\r",
+							"    method: 'POST',\r",
+							"    header: [\r",
+							"        'Content-Type:application/x-www-form-urlencoded',\r",
+							"        'Accept:application/json'\r",
+							"    ],\r",
+							"    body: {\r",
+							"        mode: 'urlencoded',\r",
+							"        urlencoded: [\r",
+							"            {key: \"client_id\", value: \"admin-cli\", disabled: false},\r",
+							"            {key: \"grant_type\", value: \"password\", disabled: false},\r",
+							"            {key: \"username\", value: pm.variables.get(\"keycloakAdminName\"), disabled: false},\r",
+							"            {key: \"password\", value: pm.variables.get(\"keycloakAdminPassword\"), disabled: false}\r",
+							"        ]\r",
+							"    }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(getAdminTokenRequest, function (err, response) {\r",
+							"        pm.variables.set(\"adminAccessToken\", response.json().access_token);\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"pm.environment.set(\"password1\", pm.variables.replaceIn('{{$randomPassword}}'))\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\": \"password\",\r\n    \"value\": \"{{password1}}\",\r\n    \"temporary\": false\r\n}\r\n"
+				},
+				"url": {
+					"raw": "{{keycloakUrl}}/admin/realms/{{realm}}/users/{{userid1}}/reset-password",
+					"host": [
+						"{{keycloakUrl}}"
+					],
+					"path": [
+						"admin",
+						"realms",
+						"{{realm}}",
+						"users",
+						"{{userid1}}",
+						"reset-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login user1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7b9bdc33-2ea5-4bf9-876c-ea8ec77dbe2c",
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)\r",
+							"pm.environment.set(\"user1AccessToken\", responseJSON[\"access_token\"]);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "{{client}}",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{email1}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{password1}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/token",
+					"host": [
+						"{{keycloakUrl}}"
+					],
+					"path": [
+						"realms",
+						"{{realm}}",
+						"protocol",
+						"openid-connect",
+						"token"
 					]
 				}
 			},
@@ -49,91 +481,26 @@
 		{
 			"name": "List people",
 			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}{{pathPrefix}}/person",
-					"host": [
-						"{{baseUrl}}{{pathPrefix}}"
-					],
-					"path": [
-						"person"
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user1AccessToken}}",
+							"type": "string"
+						}
 					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get a person",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}{{pathPrefix}}/person/{{id}}",
-					"host": [
-						"{{baseUrl}}{{pathPrefix}}"
-					],
-					"path": [
-						"person",
-						"{{id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update a person",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "cf714bb5-a47a-4cb6-bfb6-242d338090fb",
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Pupka\",\r\n    \"lastName\": \"Vasiliev\"\r\n}\r\n"
 				},
-				"url": {
-					"raw": "{{baseUrl}}{{pathPrefix}}/person/{{id}}",
-					"host": [
-						"{{baseUrl}}{{pathPrefix}}"
-					],
-					"path": [
-						"person",
-						"{{id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete a person",
-			"request": {
-				"method": "DELETE",
+				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}{{pathPrefix}}/person/{{id}}",
+					"raw": "{{baseUrl}}{{pathPrefix}}/app/person",
 					"host": [
 						"{{baseUrl}}{{pathPrefix}}"
 					],
 					"path": [
-						"person",
-						"{{id}}"
+						"app",
+						"person"
 					]
 				}
 			},
@@ -144,7 +511,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "239fcf46-1815-46a4-b579-03c2a1e488aa",
+				"id": "ec0c08be-edeb-41b8-8bac-dbfdb3b65c39",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -154,9 +521,11 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "cd8019a8-c7cb-4f54-a0a4-a984e67e4bca",
+				"id": "0f6c6ccd-71c4-40c4-b8e1-7acede021763",
 				"type": "text/javascript",
 				"exec": [
+					"tests[\"[INFO] Request: \" + (('data' in request) ? request['data'] : '') ] = true;",
+					"tests[\"[INFO] Response: \" + pm.response.code + \" \" + pm.response.status + \", body: \" + responseBody] = true;",
 					""
 				]
 			}
@@ -164,19 +533,44 @@
 	],
 	"variable": [
 		{
-			"id": "04647206-f89a-44cf-9557-7892db724451",
+			"id": "9b2b657a-5fc4-4eb0-9319-4959ab9f6754",
 			"key": "baseUrl",
 			"value": "http://arch.homework"
 		},
 		{
-			"id": "a23fca61-2249-4d9b-bb5f-823bccec1db0",
+			"id": "8b4f604b-df49-4dd4-aac6-80be178baf48",
 			"key": "pathPrefix",
 			"value": "/otusapp/audintsev"
 		},
 		{
-			"id": "243c6e0b-d88b-4e65-a353-7d584b27da3c",
-			"key": "id",
-			"value": ""
+			"id": "b2b44de7-75fb-4de9-98a9-41de79671dee",
+			"key": "keycloakUrl",
+			"value": "{{baseUrl}}{{pathPrefix}}/auth"
+		},
+		{
+			"id": "5c995c7c-d43e-486a-beb0-63ec3845f6bf",
+			"key": "keycloakAdminName",
+			"value": "admin"
+		},
+		{
+			"id": "6c757d19-47fd-440a-8f5e-9ba69ef4691c",
+			"key": "keycloakAdminPassword",
+			"value": "admin"
+		},
+		{
+			"id": "eb9cacdd-26c9-4ce2-9961-6c723b2c80c5",
+			"key": "forceAdminLogin",
+			"value": "true"
+		},
+		{
+			"id": "51157dd5-65d3-4545-b06f-4ad5b2f41a0e",
+			"key": "realm",
+			"value": "myrealm"
+		},
+		{
+			"id": "6fe2d868-9a33-40ab-a739-3e90138a4f46",
+			"key": "client",
+			"value": "myclient"
 		}
 	],
 	"protocolProfileBehavior": {}

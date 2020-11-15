@@ -147,3 +147,11 @@ The exporter exposes internal DB views, so available
 metrics are essentially documented [here](https://www.postgresql.org/docs/9.2/monitoring-stats.html)
 
 [Sample Grafana dashboard](https://grafana.com/grafana/dashboards/9628)
+
+# Keycloak
+
+https://github.com/keycloak/keycloak-documentation/blob/master/server_development/topics/admin-rest-api.adoc
+https://www.keycloak.org/docs-api/5.0/rest-api/index.html
+
+https://docs.spring.io/spring-security/site/docs/5.4.1/reference/html5/#webflux-oauth2
+https://docs.spring.io/spring-security/site/docs/5.4.1/reference/html5/#webflux-testing-jwt

@@ -15,8 +15,8 @@ dependencies:
     tags:
       - hw-database
   - name: keycloak
-    version: 0.1.x
-    repository: https://charts.bitnami.com/bitnami
+    version: 9.x.x
+    repository: https://codecentric.github.io/helm-charts
     condition: keycloak.enabled
     tags:
       - hw-idp

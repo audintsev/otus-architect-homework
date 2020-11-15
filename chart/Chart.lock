@@ -3,7 +3,7 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   version: 9.8.12
 - name: keycloak
-  repository: https://charts.bitnami.com/bitnami
-  version: 0.1.2
-digest: sha256:bd514ba74e35f81f014c35dfee0c95518b5f6cbeeb58603d3fa9159f5888e39d
-generated: "2020-11-14T11:35:47.7236872+03:00"
+  repository: https://codecentric.github.io/helm-charts
+  version: 9.5.0
+digest: sha256:489dc2e71adf60e38b57f4ab0a33e0d0327fc6d2bdfc081591f2acd6c194e4b0
+generated: "2020-11-14T14:22:16.099337+03:00"

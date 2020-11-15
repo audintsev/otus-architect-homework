@@ -83,3 +83,19 @@ Override keycloak DB name defined in the keycloak chart
 {{- define "keycloak.postgresql.fullname" -}}
 {{- printf "%s-%s" .Release.Name .Values.postgresql.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{/*
+Urls
+*/}}
+{{- define "udintsev-hw-chart.frontendUrl" -}}
+{{- printf "%s://%s%s" .Values.ingress.proto .Values.ingress.host .Values.ingress.pathPrefix }}
+{{- end }}
+{{- define "udintsev-hw-chart.keycloakFrontendUrl" -}}
+{{- printf "%s%s" (include "udintsev-hw-chart.frontendUrl" .) .Values.ingress.authPath }}
+{{- end }}
+{{- define "udintsev-hw-chart.jwtIssuerUrl" -}}
+{{- printf "%s/realms/%s" (include "udintsev-hw-chart.keycloakFrontendUrl" .) .Values.keycloakRealm }}
+{{- end }}
+{{- define "udintsev-hw-chart.appFrontendUrl" -}}
+{{- printf "%s%s" (include "udintsev-hw-chart.frontendUrl" .) .Values.ingress.appPath }}
+{{- end }}

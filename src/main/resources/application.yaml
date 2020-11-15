@@ -5,6 +5,11 @@ spring:
     pool:
       validation-depth: remote
       validation-query: "select 1 from person"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://auth.example.com
 management:
   endpoints:
     web:

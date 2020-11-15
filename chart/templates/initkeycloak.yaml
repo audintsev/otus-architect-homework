@@ -1,0 +1,94 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-init-keycloak"
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: wait-keycloak-ready
+          image: busybox
+          envFrom:
+            - configMapRef:
+                name: "{{ printf "%s-keycloak" (include "udintsev-hw-chart.name" .) }}"
+          command:
+            - sh
+            - "-c"
+            - |
+              until wget --spider $KEYCLOAK_INTERNAL_URL;
+              do sleep 1; done
+      containers:
+      - name: init-keycloak-job
+        image: alpine
+        envFrom:
+          - configMapRef:
+              name: "{{ printf "%s-keycloak" (include "udintsev-hw-chart.name" .) }}"
+          - secretRef:
+              name: "{{ printf "%s-keycloak" (include "udintsev-hw-chart.name" .) }}"
+        command:
+          - sh
+          - "-c"
+          - |
+            apk add curl jq
+
+            token=$(curl \
+              -d "client_id=admin-cli" \
+              -d "username=$KEYCLOAK_USER" \
+              -d "password=$KEYCLOAK_PASSWORD" \
+              -d "grant_type=password" \
+              "${KEYCLOAK_INTERNAL_URL}/realms/master/protocol/openid-connect/token" | jq .access_token -r)
+
+            cat <<EOF > create-realm-req.json
+            {
+              "enabled": true,
+              "id": "{{ .Values.keycloakRealm }}",
+              "realm": "{{ .Values.keycloakRealm }}",
+              "registrationAllowed": true,
+              "registrationEmailAsUsername": true,
+              "sslRequired": "none",
+              "verifyEmail": false
+            }
+            EOF
+
+            curl -v "${KEYCLOAK_INTERNAL_URL}/admin/realms" -X POST --fail \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer ${token}" \
+              -d @create-realm-req.json || exit 1
+
+            cat <<EOF > create-client-req.json
+            {
+              "enabled": true,
+              "attributes": {},
+              "redirectUris": [],
+              "clientId": "{{ .Values.keycloakClient }}",
+              "rootUrl": "{{ (include "udintsev-hw-chart.appFrontendUrl" .) }}",
+              "protocol": "openid-connect"
+            }
+            EOF
+
+            curl -v "${KEYCLOAK_INTERNAL_URL}/admin/realms/{{ .Values.keycloakRealm }}/clients" -X POST --fail \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer ${token}" \
+              -d @create-client-req.json || exit 1
+
+
+  backoffLimit: 0

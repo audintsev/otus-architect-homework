@@ -15,3 +15,23 @@ metadata:
 type: Opaque
 data:
   spring.r2dbc.password: {{ .Values.postgresql.postgresqlPassword | b64enc | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-keycloak" (include "udintsev-hw-chart.name" .) }}
+  namespace: {{ .Release.Namespace }}
+data:
+  KEYCLOAK_FRONTEND_URL: "{{ (include "udintsev-hw-chart.keycloakFrontendUrl" .) }}"
+  KEYCLOAK_INTERNAL_URL: "http://{{ include "udintsev-hw-chart.keycloakFullname" . }}-http/auth"
+  PROXY_ADDRESS_FORWARDING: "true"
+  KEYCLOAK_USER: "{{ .Values.keycloakUser }}"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ printf "%s-keycloak" (include "udintsev-hw-chart.name" .) }}
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+data:
+  KEYCLOAK_PASSWORD: {{ .Values.keycloakPassword | b64enc | quote }}

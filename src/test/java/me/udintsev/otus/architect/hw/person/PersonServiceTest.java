@@ -4,6 +4,8 @@ import me.udintsev.otus.architect.hw.DatabaseConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import reactor.test.StepVerifier;
 
 import java.util.function.Consumer;
@@ -14,6 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PersonServiceTest {
     @Autowired
     PersonService personService;
+
+    @MockBean
+    ReactiveJwtDecoder jwtDecoder;
 
     @Test
     void createAndList() {

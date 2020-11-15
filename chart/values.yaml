@@ -8,8 +8,16 @@ service:
   port: 8080
 
 ingress:
-  host: arch.homework
+  proto: http
+  host: arch.labs
   pathPrefix: /otusapp/audintsev
+  appPath: /app
+  authPath: /auth
+
+keycloakUser: admin
+keycloakPassword: admin
+keycloakRealm: myrealm
+keycloakClient: myclient
 
 metrics:
   serviceMonitor:
@@ -17,7 +25,7 @@ metrics:
 
 postgresql:
   enabled: true
-  nameOverride: app-db
+  nameOverride: db-app
   postgresqlUsername: myuser
   postgresqlPassword: passwd
   postgresqlDatabase: myapp
@@ -32,13 +40,11 @@ postgresql:
 keycloak:
   enabled: true
   postgresql:
-    nameOverride: keycloak-db
-  auth:
-    createAdminUser: true
-    adminUser: admin
-    adminPassword: admin
+    nameOverride: db-keycloak
   service:
     type: ClusterIP
-  args:
-    - "/opt/bitnami/scripts/keycloak/run.sh"
-    - "-Dkeycloak.frontendUrl=http://arch.homework/otusapp/audintsev/auth"
+  extraEnvFrom: |
+    - configMapRef:
+        name: udintsev-hw-keycloak
+    - secretRef:
+        name: udintsev-hw-keycloak

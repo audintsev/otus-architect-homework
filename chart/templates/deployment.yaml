@@ -17,10 +17,21 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
     spec:
+      initContainers:
+        - name: wait-jwt-issuer-ready
+          image: busybox
+          env:
+            - name: JWT_ISSUER_URL
+              value: "{{ (include "udintsev-hw-chart.jwtIssuerUrl" .) }}"
+          command:
+            - sh
+            - "-c"
+            - |
+              until wget --spider $JWT_ISSUER_URL;
+              do sleep 1; done
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
-          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8080
@@ -32,11 +43,11 @@ spec:
                 name: "{{ printf "%s-app" (include "udintsev-hw-chart.fullname" .) }}"
           env:
             - name: spring.security.oauth2.resourceserver.jwt.issuer-uri
-              value: "{{ print "%s%s/auth" .Values.ingress.host .Values.ingress.pathPrefix }}"
+              value: "{{ (include "udintsev-hw-chart.jwtIssuerUrl" .) }}"
           livenessProbe:
             httpGet:
               port: 8080
-              path: /actuator/health
+              path: /actuator/health/liveness
             initialDelaySeconds: 10
             periodSeconds: 5
             timeoutSeconds: 2
