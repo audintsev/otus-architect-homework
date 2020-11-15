@@ -155,3 +155,7 @@ https://www.keycloak.org/docs-api/5.0/rest-api/index.html
 
 https://docs.spring.io/spring-security/site/docs/5.4.1/reference/html5/#webflux-oauth2
 https://docs.spring.io/spring-security/site/docs/5.4.1/reference/html5/#webflux-testing-jwt
+
+```
+newman run --env-var "baseUrl=http://arch.labs" postman_collection.json
+```
