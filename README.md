@@ -70,7 +70,7 @@ TODO (?):
 Comments:
 
 * I don't use embedded DB migrations (managed by Liquibase or Flyway). Tests create schema defined in
-[schema.sql](src/test/resources/schema.sql). When running _productively_ schema needs to be pre-created
+[schema.sql](app/src/test/resources/schema.sql). When running _productively_ schema needs to be pre-created
 by a Kubernetes job. The reasons for choosing this design are:
   * I'd like to experiment with Kubernetes jobs
   * neither Liquibase nor Flyway can natively work R2DBC connections
@@ -97,8 +97,13 @@ java -jar otus-architect-homework-0.0.1-SNAPSHOT.jar --spring.r2dbc.url=r2dbc:po
 ### Image: building and pushing
 
 ```
-./gradlew bootBuildImage --imageName=udintsev/hw:latest
-docker push udintsev/hw:latest
+cd app
+./gradlew bootBuildImage --imageName=udintsev/hw12-app:latest
+docker push udintsev/hw12-app:latest
+
+cd ../gateway
+docker build -t udintsev/hw12-gw:latest .
+docker push udintsev/hw12-gw:latest
 ```
 
 ### Useful links
@@ -155,6 +160,9 @@ https://www.keycloak.org/docs-api/5.0/rest-api/index.html
 
 https://docs.spring.io/spring-security/site/docs/5.4.1/reference/html5/#webflux-oauth2
 https://docs.spring.io/spring-security/site/docs/5.4.1/reference/html5/#webflux-testing-jwt
+
+https://engineering.pivotal.io/post/faking_oauth_sso/
+https://www.baeldung.com/spring-security-oauth-resource-server
 
 ```
 newman run --env-var "baseUrl=http://arch.labs" postman_collection.json

@@ -1,0 +1,9 @@
+{
+  "routes": [
+    {
+      "source": "^/app/(.*)",
+      "target": "/$1",
+      "destination": "int_app"
+    }
+  ]
+}

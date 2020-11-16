@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ printf "%s-app" (include "udintsev-hw-chart.fullname" .) }}
+  name: {{ include "udintsev-hw-chart.name" . }}-app
   namespace: {{ .Release.Namespace }}
 data:
   spring.r2dbc.url: {{ printf "r2dbc:postgresql://%s:%s/%s" (include "udintsev-hw-chart.dbFullname" .) .Values.postgresql.service.port  .Values.postgresql.postgresqlDatabase }}
@@ -10,7 +10,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ printf "%s-app" (include "udintsev-hw-chart.fullname" .) }}
+  name: {{ include "udintsev-hw-chart.name" . }}-app
   namespace: {{ .Release.Namespace }}
 type: Opaque
 data:
@@ -19,7 +19,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ printf "%s-keycloak" (include "udintsev-hw-chart.name" .) }}
+  name: {{ include "udintsev-hw-chart.name" . }}-keycloak
   namespace: {{ .Release.Namespace }}
 data:
   KEYCLOAK_FRONTEND_URL: "{{ (include "udintsev-hw-chart.keycloakFrontendUrl" .) }}"
@@ -30,7 +30,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ printf "%s-keycloak" (include "udintsev-hw-chart.name" .) }}
+  name: {{ include "udintsev-hw-chart.name" . }}-keycloak
   namespace: {{ .Release.Namespace }}
 type: Opaque
 data:

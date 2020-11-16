@@ -29,7 +29,7 @@ spec:
           image: busybox
           envFrom:
             - configMapRef:
-                name: "{{ printf "%s-keycloak" (include "udintsev-hw-chart.name" .) }}"
+                name: "{{ include "udintsev-hw-chart.name" . }}-keycloak"
           command:
             - sh
             - "-c"
@@ -41,9 +41,9 @@ spec:
         image: alpine
         envFrom:
           - configMapRef:
-              name: "{{ printf "%s-keycloak" (include "udintsev-hw-chart.name" .) }}"
+              name: "{{ include "udintsev-hw-chart.name" . }}-keycloak"
           - secretRef:
-              name: "{{ printf "%s-keycloak" (include "udintsev-hw-chart.name" .) }}"
+              name: "{{ include "udintsev-hw-chart.name" . }}-keycloak"
         command:
           - sh
           - "-c"
@@ -80,7 +80,7 @@ spec:
               "attributes": {},
               "redirectUris": [],
               "clientId": "{{ .Values.keycloakClient }}",
-              "rootUrl": "{{ (include "udintsev-hw-chart.appFrontendUrl" .) }}",
+              "rootUrl": "{{ include "udintsev-hw-chart.frontendUrl" . }}",
               "protocol": "openid-connect"
             }
             EOF

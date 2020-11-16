@@ -1,16 +1,33 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "udintsev-hw-chart.fullname" . }}
+  name: {{ include "udintsev-hw-chart.fullname" . }}-app
   namespace: {{ .Release.Namespace }}
   labels:
-  {{- include "udintsev-hw-chart.labels" . | nindent 4 }}
+  {{- include "udintsev-hw-chart.labels.app" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.service.app.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .Values.service.app.port }}
       targetPort: http
       protocol: TCP
       name: http
   selector:
-  {{- include "udintsev-hw-chart.selectorLabels" . | nindent 4 }}
+  {{- include "udintsev-hw-chart.selectorLabels.app" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "udintsev-hw-chart.fullname" . }}-gw
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "udintsev-hw-chart.labels.gw" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.gw.type }}
+  ports:
+    - port: {{ .Values.service.gw.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+  {{- include "udintsev-hw-chart.selectorLabels.gw" . | nindent 4 }}

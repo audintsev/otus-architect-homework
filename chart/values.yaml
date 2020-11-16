@@ -1,17 +1,25 @@
 replicaCount: 2
 
 image:
-  repository: udintsev/hw
+  app: udintsev/hw12-app
+  gw: udintsev/hw12-gw
 
 service:
-  type: ClusterIP
-  port: 8080
+  app:
+    type: ClusterIP
+    port: 8080
+  gw:
+    type: ClusterIP
+    port: 5000
 
 ingress:
   proto: http
   host: arch.labs
-  pathPrefix: /otusapp/audintsev
-  appPath: /app
+  pathPrefix:
+  gwPath: /
+  # That doesn't work currently:
+  #  pathPrefix: /otusapp/audintsev
+  #  gwPath: /gw
   authPath: /auth
 
 keycloakUser: admin
@@ -45,6 +53,6 @@ keycloak:
     type: ClusterIP
   extraEnvFrom: |
     - configMapRef:
-        name: udintsev-hw-keycloak
+        name: arch-homework-keycloak
     - secretRef:
-        name: udintsev-hw-keycloak
+        name: arch-homework-keycloak

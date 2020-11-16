@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "udintsev-hw-chart.fullname" . }}
+  name: {{ include "udintsev-hw-chart.fullname" . }}-app
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "udintsev-hw-chart.labels" . | nindent 4 }}
+    {{- include "udintsev-hw-chart.labels.app" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "udintsev-hw-chart.selectorLabels" . | nindent 6 }}
+      {{- include "udintsev-hw-chart.selectorLabels.app" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "udintsev-hw-chart.selectorLabels" . | nindent 8 }}
+        {{- include "udintsev-hw-chart.selectorLabels.app" . | nindent 8 }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
     spec:
       initContainers:
-        - name: wait-jwt-issuer-ready
+        - name: {{ .Chart.Name }}-app-wait-jwt-issuer-ready
           image: busybox
           env:
             - name: JWT_ISSUER_URL
@@ -30,17 +30,17 @@ spec:
               until wget --spider $JWT_ISSUER_URL;
               do sleep 1; done
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+        - name: {{ .Chart.Name }}-app
+          image: "{{ .Values.image.app }}:{{ .Chart.AppVersion }}"
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
           envFrom:
             - configMapRef:
-                name: "{{ printf "%s-app" (include "udintsev-hw-chart.fullname" .) }}"
+                name: "{{ include "udintsev-hw-chart.name" . }}-app"
             - secretRef:
-                name: "{{ printf "%s-app" (include "udintsev-hw-chart.fullname" .) }}"
+                name: "{{ include "udintsev-hw-chart.name" . }}-app"
           env:
             - name: spring.security.oauth2.resourceserver.jwt.issuer-uri
               value: "{{ (include "udintsev-hw-chart.jwtIssuerUrl" .) }}"
@@ -57,3 +57,59 @@ spec:
               path: /actuator/health/readiness
             initialDelaySeconds: 10
             periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "udintsev-hw-chart.fullname" . }}-gw
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "udintsev-hw-chart.labels.gw" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+  {{- include "udintsev-hw-chart.selectorLabels.gw" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+      {{- include "udintsev-hw-chart.selectorLabels.gw" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-gw
+          image: "{{ .Values.image.gw }}:{{ .Chart.AppVersion }}"
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          env:
+            - name: CALLBACK_URL
+              value: {{ include "udintsev-hw-chart.gwFrontendUrl" . }}/login/callback
+            - name: destinations
+              value: |
+                [
+                  {
+                    "name": "int_app",
+                    "url": "http://{{ include "udintsev-hw-chart.fullname" . }}-app:{{ .Values.service.app.port }}",
+                    "forwardAuthToken": true
+                  }
+                ]
+            - name: VCAP_SERVICES
+              value: |
+                {
+                  "xsuaa": [
+                    {
+                      "tags": [
+                          "xsuaa"
+                      ],
+                      "credentials": {
+                        "url": "{{ include "udintsev-hw-chart.jwtIssuerUrl" . }}",
+                        "xsappname": "hw-app",
+                        "clientid": "{{ .Values.keycloakClient }}",
+                        "clientsecret": "client-secret"
+                      }
+                    }
+                  ]
+                }

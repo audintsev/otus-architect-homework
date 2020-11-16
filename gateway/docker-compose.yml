@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  gateway:
+    build: .
+    image: udintsev/hw12-gw:latest
+    ports:
+    - 5000:5000
+    environment:
+      destinations: |
+        [
+          {
+            "name": "int_app",
+            "url": "http://arch.labs/otusapp/audintsev/app",
+            "forwardAuthToken": true
+          }
+        ]
+      VCAP_SERVICES: |
+        {
+          "xsuaa": [
+            {
+              "tags": [
+                  "xsuaa"
+              ],
+              "credentials": {
+                "url": "http://arch.labs/otusapp/audintsev/auth/realms/myrealm",
+                "xsappname": "hw-app",
+                "clientid": "myclient",
+                "clientsecret": "client-secret"
+              }
+            }
+          ]
+        }

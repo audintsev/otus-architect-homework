@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ printf "%s-auth" (include "udintsev-hw-chart.fullname" .) }}
+  name: {{ include "udintsev-hw-chart.fullname" . }}-auth
   namespace: {{ .Release.Namespace }}
   annotations:
     kubernetes.io/ingress.class: "nginx"
@@ -11,7 +11,7 @@ spec:
     - host: "{{ .Values.ingress.host }}"
       http:
         paths:
-          - path: {{ printf "%s%s($|/)(.*)" .Values.ingress.pathPrefix .Values.ingress.authPath }}
+          - path: {{ .Values.ingress.pathPrefix }}{{ .Values.ingress.authPath }}($|/)(.*)
             backend:
               serviceName: {{ include "udintsev-hw-chart.keycloakFullname" . }}-http
               servicePort: http
@@ -19,7 +19,7 @@ spec:
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ printf "%s-app" (include "udintsev-hw-chart.fullname" .) }}
+  name: {{ include "udintsev-hw-chart.fullname" . }}-gw
   namespace: {{ .Release.Namespace }}
   annotations:
     kubernetes.io/ingress.class: "nginx"
@@ -29,7 +29,7 @@ spec:
     - host: "{{ .Values.ingress.host }}"
       http:
         paths:
-          - path: {{ printf "%s%s($|/)(.*)" .Values.ingress.pathPrefix .Values.ingress.appPath }}
+          - path: {{ include "udintsev-hw-chart.gwIngressPath" . }}
             backend:
-              serviceName: {{ include "udintsev-hw-chart.fullname" . }}
+              serviceName: {{ include "udintsev-hw-chart.fullname" . }}-gw
               servicePort: http

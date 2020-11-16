@@ -4,7 +4,7 @@ metadata:
   name: "{{ include "udintsev-hw-chart.fullname" . }}-test-connection"
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "udintsev-hw-chart.labels" . | nindent 4 }}
+    {{- include "udintsev-hw-chart.labels.app" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test-success
 spec:
@@ -12,5 +12,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "udintsev-hw-chart.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ include "udintsev-hw-chart.fullname" . }}-app:{{ .Values.service.port }}']
   restartPolicy: Never

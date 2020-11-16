@@ -33,9 +33,18 @@ Create chart name and version as used by the chart label.
 {{/*
 Common labels
 */}}
-{{- define "udintsev-hw-chart.labels" -}}
+{{- define "udintsev-hw-chart.labels.app" -}}
 helm.sh/chart: {{ include "udintsev-hw-chart.chart" . }}
-{{ include "udintsev-hw-chart.selectorLabels" . }}
+{{ include "udintsev-hw-chart.selectorLabels.app" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{- define "udintsev-hw-chart.labels.gw" -}}
+helm.sh/chart: {{ include "udintsev-hw-chart.chart" . }}
+{{ include "udintsev-hw-chart.selectorLabels.gw" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,8 +54,12 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "udintsev-hw-chart.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "udintsev-hw-chart.name" . }}
+{{- define "udintsev-hw-chart.selectorLabels.app" -}}
+app.kubernetes.io/name: {{ include "udintsev-hw-chart.name" . }}-app
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+{{- define "udintsev-hw-chart.selectorLabels.gw" -}}
+app.kubernetes.io/name: {{ include "udintsev-hw-chart.name" . }}-gw
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
@@ -88,7 +101,7 @@ Override keycloak DB name defined in the keycloak chart
 Urls
 */}}
 {{- define "udintsev-hw-chart.frontendUrl" -}}
-{{- printf "%s://%s%s" .Values.ingress.proto .Values.ingress.host .Values.ingress.pathPrefix }}
+{{- printf "%s://%s%s" .Values.ingress.proto .Values.ingress.host (.Values.ingress.pathPrefix | default "") }}
 {{- end }}
 {{- define "udintsev-hw-chart.keycloakFrontendUrl" -}}
 {{- printf "%s%s" (include "udintsev-hw-chart.frontendUrl" .) .Values.ingress.authPath }}
@@ -96,6 +109,14 @@ Urls
 {{- define "udintsev-hw-chart.jwtIssuerUrl" -}}
 {{- printf "%s/realms/%s" (include "udintsev-hw-chart.keycloakFrontendUrl" .) .Values.keycloakRealm }}
 {{- end }}
-{{- define "udintsev-hw-chart.appFrontendUrl" -}}
-{{- printf "%s%s" (include "udintsev-hw-chart.frontendUrl" .) .Values.ingress.appPath }}
+
+{{- define "udintsev-hw-chart.gwFrontendUrl" -}}
+{{- printf "%s%s" (include "udintsev-hw-chart.frontendUrl" .) (.Values.ingress.gwPath | default "") }}
+{{- end }}
+{{- define "udintsev-hw-chart.gwIngressPath" }}
+{{- if .Values.ingress.pathPrefix }}
+{{- printf "%s%s($|/)(.*)" .Values.ingress.pathPrefix .Values.ingress.gwPath }}
+{{- else }}
+{{- printf "%s()(.*)" .Values.ingress.gwPath }}
+{{- end }}
 {{- end }}

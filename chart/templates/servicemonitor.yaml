@@ -5,7 +5,7 @@ metadata:
   name: {{ include "udintsev-hw-chart.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "udintsev-hw-chart.labels" . | nindent 4 }}
+    {{- include "udintsev-hw-chart.labels.app" . | nindent 4 }}
 spec:
   jobLabel: {{ include "udintsev-hw-chart.fullname" . }}
   namespaceSelector:
@@ -13,7 +13,7 @@ spec:
     - "{{ $.Release.Namespace }}"
   selector:
     matchLabels:
-      {{- include "udintsev-hw-chart.selectorLabels" . | nindent 6 }}
+      {{- include "udintsev-hw-chart.selectorLabels.app" . | nindent 6 }}
   endpoints:
   - interval: 15s
     port: http

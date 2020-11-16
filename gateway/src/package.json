@@ -1,0 +1,14 @@
+{
+  "name": "gateway",
+  "version": "0.0.1",
+  "engines": {
+    "node": "12.x.x"
+  },
+  "scripts": {
+    "start": "node -r ./patch-approuter-oauth-options.js ../node_modules/@sap/approuter/approuter.js",
+    "local": "node -r ./patch-approuter-oauth-options.js local.js"
+  },
+  "dependencies": {
+    "@sap/approuter": "^8.5.5"
+  }
+}

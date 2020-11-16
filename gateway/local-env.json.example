@@ -1,0 +1,24 @@
+{
+  "destinations": [
+    {
+      "name": "int_app",
+      "url": "http://arch.homework/otusapp/audintsev/app",
+      "forwardAuthToken": true
+    }
+  ],
+  "VCAP_SERVICES": {
+    "xsuaa": [
+      {
+        "tags": [
+          "xsuaa"
+        ],
+        "credentials": {
+          "url": "http://arch.homework/otusapp/audintsev/auth/realms/myrealm",
+          "xsappname": "hw-app",
+          "clientid": "myclient",
+          "clientsecret": "myclient-secret"
+        }
+      }
+    ]
+  }
+}
