@@ -2,6 +2,7 @@ package me.udintsev.otus.architect.hw.person;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -17,12 +18,14 @@ import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple3;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 @Component
@@ -30,6 +33,7 @@ import java.util.function.Supplier;
 public class PersonHandler {
     public static final String URI_BASE = "/person";
     public static final String URI_REGISTER = "%s/register".formatted(URI_BASE);
+    public static final String URI_HELLO = "%s/hello".formatted(URI_BASE);
     public static final String PATH_VARIABLE_ID = "id";
     public static final String URI_WITH_ID = "%s/{%s}".formatted(URI_BASE, PATH_VARIABLE_ID);
 
@@ -40,6 +44,35 @@ public class PersonHandler {
                          PersonService personService) {
         this.validator = validator;
         this.personService = personService;
+    }
+
+    public Mono<ServerResponse> hello() {
+        return getJwt()
+                .flatMap(jwt -> {
+                    String email = (String) jwt.getClaims().get("email");
+                    if (email != null) {
+                        return personService.getByEmail(email)
+                                .flatMap(person -> ServerResponse.ok()
+                                        .contentType(MediaType.TEXT_PLAIN)
+                                        .bodyValue("Welcome back, %s %s (%s)".formatted(
+                                                person.getFirstName(), person.getLastName(), person.getEmail()
+                                        ))
+                                )
+                                .switchIfEmpty(ServerResponse.ok()
+                                        .contentType(MediaType.TEXT_PLAIN)
+                                        .bodyValue("Hello %s %s (%s), go ahead and register!".formatted(
+                                                jwt.getClaims().get("given_name"),
+                                                jwt.getClaims().get("family_name"),
+                                                email
+                                        )));
+                    } else {
+                        return ServerResponse.ok()
+                                .contentType(MediaType.TEXT_PLAIN)
+                                .bodyValue("Hello email-less user :(");
+                    }
+                })
+                .flatMap(person -> ServerResponse.ok().bodyValue(person))
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
@@ -80,16 +113,12 @@ public class PersonHandler {
 
     @Transactional
     public Mono<ServerResponse> register() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .filter(authentication -> authentication.getCredentials() instanceof AbstractOAuth2Token)
-                .map(Authentication::getCredentials)
-                .cast(Jwt.class)
+        return getJwt()
                 .flatMap(jwt -> {
                     var claims = jwt.getClaims();
-                    String email = (String)claims.get("email");
-                    String firstName = (String)claims.get("given_name");
-                    String lastName = (String)claims.get("family_name");
+                    String email = (String) claims.get("email");
+                    String firstName = (String) claims.get("given_name");
+                    String lastName = (String) claims.get("family_name");
                     return personService.create(email, firstName, lastName)
                             .flatMap(person -> ServerResponse
                                     .created(URI.create(String.format("%s/%s", URI_BASE, person.getId())))
@@ -114,15 +143,24 @@ public class PersonHandler {
     public Mono<ServerResponse> update(ServerRequest request) {
         return request.bodyToMono(PersonUpdateRequest.class)
                 .flatMap(body -> validateAndThen(body, () -> {
-                        long id = idFromRequest(request);
-                        return personService.get(id)
-                                .flatMap(person ->
-                                    personService.update(person.getId(), person.getEmail(), body.getFirstName(), body.getLastName())
-                                )
-                                .flatMap(person -> ServerResponse.ok()
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .bodyValue(person))
-                                .switchIfEmpty(ServerResponse.notFound().build());
+                    long id = idFromRequest(request);
+                    return Mono.zip(personService.get(id), getJwt())
+                            .flatMap(tuple -> {
+                                var person = tuple.getT1();
+                                var jwt = tuple.getT2();
+                                var jwtEmail = (String) jwt.getClaims().get("email");
+
+                                if (Objects.equals(person.getEmail(), jwtEmail)) {
+                                    return personService.update(person.getId(), person.getEmail(), body.getFirstName(), body.getLastName())
+                                            .flatMap(updatedPerson -> ServerResponse.ok()
+                                                    .contentType(MediaType.APPLICATION_JSON)
+                                                    .bodyValue(updatedPerson));
+                                } else {
+                                    return ServerResponse.status(HttpStatus.FORBIDDEN).build();
+                                }
+
+                            })
+                            .switchIfEmpty(ServerResponse.notFound().build());
                 }));
     }
 
@@ -130,6 +168,14 @@ public class PersonHandler {
     public Mono<ServerResponse> delete(ServerRequest request) {
         return personService.delete(idFromRequest(request))
                 .then(ServerResponse.noContent().build());
+    }
+
+    private Mono<Jwt> getJwt() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .filter(authentication -> authentication.getCredentials() instanceof AbstractOAuth2Token)
+                .map(Authentication::getCredentials)
+                .cast(Jwt.class);
     }
 
     private static long idFromRequest(ServerRequest request) {

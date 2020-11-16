@@ -24,6 +24,7 @@ public class Application {
         return RouterFunctions.route()
                 .GET(PersonHandler.URI_WITH_ID, personHandler::get)
                 .GET(PersonHandler.URI_BASE, req -> personHandler.list())
+                .GET(PersonHandler.URI_HELLO, req -> personHandler.hello())
                 .POST(PersonHandler.URI_BASE, personHandler::create)
                 .POST(PersonHandler.URI_REGISTER, req -> personHandler.register())
                 .PUT(PersonHandler.URI_WITH_ID, personHandler::update)

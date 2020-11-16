@@ -39,6 +39,13 @@ public class PersonService {
                 .one();
     }
 
+    public Mono<Person> getByEmail(String email) {
+        return databaseClient.sql("%s where %s=:email".formatted(SELECT_BASE, COL_EMAIL))
+                .bind("email", email)
+                .map(MAPPER)
+                .one();
+    }
+
     public Flux<Person> list() {
         return databaseClient.sql(SELECT_BASE)
                 .map(MAPPER)
