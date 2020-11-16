@@ -111,12 +111,12 @@ Urls
 {{- end }}
 
 {{- define "udintsev-hw-chart.gwFrontendUrl" -}}
-{{- printf "%s%s" (include "udintsev-hw-chart.frontendUrl" .) (.Values.ingress.gwPath | default "") }}
+{{- printf "%s%s" (include "udintsev-hw-chart.frontendUrl" .) (.Values.ingress.gwPath | default "/") }}
 {{- end }}
 {{- define "udintsev-hw-chart.gwIngressPath" }}
 {{- if .Values.ingress.pathPrefix }}
-{{- printf "%s%s($|/)(.*)" .Values.ingress.pathPrefix .Values.ingress.gwPath }}
+{{- printf "%s%s($|/)(.*)" .Values.ingress.pathPrefix (.Values.ingress.gwPath | default "/") }}
 {{- else }}
-{{- printf "%s()(.*)" .Values.ingress.gwPath }}
+{{- printf "%s()(.*)" (.Values.ingress.gwPath | default "/") }}
 {{- end }}
 {{- end }}

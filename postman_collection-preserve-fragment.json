@@ -192,15 +192,28 @@
 					"script": {
 						"id": "473039d9-777b-4732-bfca-b35e2659dcf5",
 						"exec": [
-							"const re = /action=\"([^\"]+)\"/\r",
-							"const capturedPostUrl = re.exec(responseBody)[1]\r",
+							"const re = /document.cookie=(.*);document.cookie=(.*);document.cookie=\"signature=(.*);path=\\/\";location=\"([^\"]+)\"/\r",
 							"\r",
-							"// Hell, why there is no replaceAll???\r",
-							"const loginPostUrl = capturedPostUrl.split(\"&amp;\").join(\"&\")\r",
+							"const result = re.exec(responseBody)\r",
+							"const signature = result[3]\r",
+							"const location = result[4]\r",
 							"\r",
-							"pm.environment.set(\"loginPostUrl\", loginPostUrl)\r",
+							"const expectedRedirectUri = pm.variables.replaceIn(\"{{baseUrl}}/login/callback\")\r",
+							"const locationBase = pm.variables.replaceIn(\"{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/auth?response_type=code&client_id={{client}}&redirect_uri=\")\r",
 							"\r",
-							"tests[`[INFO] loginPostUrl =: ${loginPostUrl}`] = loginPostUrl != null\r",
+							"const appUrl = pm.variables.replaceIn(\"{{appUrl}}\")\r",
+							"const domain = /(http|https):\\/\\/([^\\/]+)/.exec(appUrl)[2]\r",
+							"\r",
+							"const jar = pm.cookies.jar();\r",
+							"jar.set(domain, { name: \"fragmentAfterLogin\", value: \"\"} )\r",
+							"jar.set(domain, \"locationAfterLogin\", pm.variables.replaceIn(\"{{pathPrefix}}/app/person\"))\r",
+							"jar.set(domain, \"signature\", signature)\r",
+							"\r",
+							"pm.environment.set(\"idpLoginPage\", locationBase + expectedRedirectUri)\r",
+							"\r",
+							"tests[\"Authorization code flow initiated: user is redirected to IdP: \" + location ] = location === locationBase + encodeURIComponent(expectedRedirectUri);\r",
+							"tests[\"Captured signature: \" + signature ] = signature != null;\r",
+							"\r",
 							""
 						],
 						"type": "text/javascript"
@@ -236,7 +249,55 @@
 			"response": []
 		},
 		{
-			"name": "User1 login step2: post login form, get redirected back to callback with auth code and then again to the original app's URL",
+			"name": "User1 login step2: open IdP login page",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7b243890-908b-4e34-96bf-2add6da1878d",
+						"exec": [
+							"const re = /action=\"([^\"]+)\"/\r",
+							"const capturedPostUrl = re.exec(responseBody)[1]\r",
+							"\r",
+							"// Hell, why there is no replaceAll???\r",
+							"const loginPostUrl = capturedPostUrl.split(\"&amp;\").join(\"&\")\r",
+							"\r",
+							"pm.environment.set(\"loginPostUrl\", loginPostUrl)\r",
+							"\r",
+							"tests[`[INFO] loginPostUrl =: ${loginPostUrl}`] = loginPostUrl != null\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8737697d-55db-4fa7-9d07-ddc9d9d4bd75",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{idpLoginPage}}",
+					"host": [
+						"{{idpLoginPage}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User1 login step3: post login form",
 			"event": [
 				{
 					"listen": "test",
@@ -616,15 +677,28 @@
 					"script": {
 						"id": "40a31c06-3dae-48ee-8ac8-78bf48116dfc",
 						"exec": [
-							"const re = /action=\"([^\"]+)\"/\r",
-							"const capturedPostUrl = re.exec(responseBody)[1]\r",
+							"const re = /document.cookie=(.*);document.cookie=(.*);document.cookie=\"signature=(.*);path=\\/\";location=\"([^\"]+)\"/\r",
 							"\r",
-							"// Hell, why there is no replaceAll???\r",
-							"const loginPostUrl = capturedPostUrl.split(\"&amp;\").join(\"&\")\r",
+							"const result = re.exec(responseBody)\r",
+							"const signature = result[3]\r",
+							"const location = result[4]\r",
 							"\r",
-							"pm.environment.set(\"loginPostUrl\", loginPostUrl)\r",
+							"const expectedRedirectUri = pm.variables.replaceIn(\"{{baseUrl}}/login/callback\")\r",
+							"const locationBase = pm.variables.replaceIn(\"{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/auth?response_type=code&client_id={{client}}&redirect_uri=\")\r",
 							"\r",
-							"tests[`[INFO] loginPostUrl =: ${loginPostUrl}`] = loginPostUrl != null\r",
+							"const appUrl = pm.variables.replaceIn(\"{{appUrl}}\")\r",
+							"const domain = /(http|https):\\/\\/([^\\/]+)/.exec(appUrl)[2]\r",
+							"\r",
+							"const jar = pm.cookies.jar();\r",
+							"jar.set(domain, { name: \"fragmentAfterLogin\", value: \"\"} )\r",
+							"jar.set(domain, \"locationAfterLogin\", pm.variables.replaceIn(\"{{pathPrefix}}/app/person\"))\r",
+							"jar.set(domain, \"signature\", signature)\r",
+							"\r",
+							"pm.environment.set(\"idpLoginPage\", locationBase + expectedRedirectUri)\r",
+							"\r",
+							"tests[\"Authorization code flow initiated: user is redirected to IdP: \" + location ] = location === locationBase + encodeURIComponent(expectedRedirectUri);\r",
+							"tests[\"Captured signature: \" + signature ] = signature != null;\r",
+							"\r",
 							""
 						],
 						"type": "text/javascript"
@@ -660,7 +734,55 @@
 			"response": []
 		},
 		{
-			"name": "User2 login step2: post login form, get redirected back to callback with auth code and then again to the original app's URL",
+			"name": "User2 login step2: open IdP login page",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f9744892-7123-46ad-a39b-b49349293f8d",
+						"exec": [
+							"const re = /action=\"([^\"]+)\"/\r",
+							"const capturedPostUrl = re.exec(responseBody)[1]\r",
+							"\r",
+							"// Hell, why there is no replaceAll???\r",
+							"const loginPostUrl = capturedPostUrl.split(\"&amp;\").join(\"&\")\r",
+							"\r",
+							"pm.environment.set(\"loginPostUrl\", loginPostUrl)\r",
+							"\r",
+							"tests[`[INFO] loginPostUrl =: ${loginPostUrl}`] = loginPostUrl != null\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "84789c8b-7774-45a5-9ca0-b742f75c907b",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{idpLoginPage}}",
+					"host": [
+						"{{idpLoginPage}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User2 login step3: post login form",
 			"event": [
 				{
 					"listen": "test",
@@ -777,49 +899,6 @@
 				}
 			},
 			"response": []
-		},
-		{
-			"name": "User2 updates User1's proifile in the app",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "e5b8bb75-48b0-4821-9fef-b255008edad4",
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Michael\",\r\n    \"lastName\": \"Jackson\"\r\n}\r\n"
-				},
-				"url": {
-					"raw": "{{appUrl}}/person/{{user1AppId}}",
-					"host": [
-						"{{appUrl}}"
-					],
-					"path": [
-						"person",
-						"{{user1AppId}}"
-					]
-				}
-			},
-			"response": []
 		}
 	],
 	"event": [
@@ -848,47 +927,47 @@
 	],
 	"variable": [
 		{
-			"id": "07d0d3a3-3037-4cfb-8c47-d3e6452af56a",
+			"id": "10695366-bf0b-4929-81fa-d670329ee366",
 			"key": "baseUrl",
 			"value": "http://arch.homework"
 		},
 		{
-			"id": "e62ef49a-0d19-4eb7-9280-566af1beef12",
+			"id": "2ff4c072-923b-481c-a64e-afe107fccf04",
 			"key": "pathPrefix",
 			"value": ""
 		},
 		{
-			"id": "6cc7e632-42f0-44a8-b8f7-ada7e8458342",
+			"id": "c96e406b-f57b-4645-9e4a-b24b9bede545",
 			"key": "keycloakUrl",
 			"value": "{{baseUrl}}{{pathPrefix}}/auth"
 		},
 		{
-			"id": "d50c6233-f35a-4d6f-a6d5-021a1d088b6c",
+			"id": "fcf4afa2-dd40-4d26-93ed-1a09f985f542",
 			"key": "keycloakAdminName",
 			"value": "admin"
 		},
 		{
-			"id": "5d90bb36-bc4a-4e52-b1eb-e3c400608c37",
+			"id": "2d5117ca-172d-402a-8019-362bcb2b76a7",
 			"key": "keycloakAdminPassword",
 			"value": "admin"
 		},
 		{
-			"id": "296e3bc2-983a-4ed6-bce1-7b73de3ded3d",
+			"id": "481e8c9b-ac1d-4fb4-b90d-df1913bf6725",
 			"key": "forceAdminLogin",
 			"value": "true"
 		},
 		{
-			"id": "57c97cf1-962e-4c24-a628-611e596a118f",
+			"id": "80832977-f0d2-411f-8e9f-dde3e4c0acbb",
 			"key": "realm",
 			"value": "myrealm"
 		},
 		{
-			"id": "5f3894dd-e0e3-48b7-8b6f-360622f02ff1",
+			"id": "69576e27-6259-4e9b-87eb-22c1a04ab697",
 			"key": "client",
 			"value": "myclient"
 		},
 		{
-			"id": "efd32a6b-bd46-4347-8e76-9ec1cd355fe0",
+			"id": "dc62b543-75f4-4d6a-b9bb-1ec9732d7ba3",
 			"key": "appUrl",
 			"value": "{{baseUrl}}{{pathPrefix}}/app"
 		}

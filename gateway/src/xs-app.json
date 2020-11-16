@@ -3,7 +3,11 @@
     {
       "source": "^/app/(.*)",
       "target": "/$1",
-      "destination": "int_app"
+      "destination": "int_app",
+      "csrfProtection": false
     }
-  ]
+  ],
+  "logout": {
+    "logoutEndpoint": "/logout"
+  }
 }

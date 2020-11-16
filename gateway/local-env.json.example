@@ -1,8 +1,10 @@
 {
+  "CALLBACK_URL": "http://localhost:5000/login/callback",
+  "PRESERVE_FRAGMENT": "false",
   "destinations": [
     {
       "name": "int_app",
-      "url": "http://arch.homework/otusapp/audintsev/app",
+      "url": "http://arch.homework/app",
       "forwardAuthToken": true
     }
   ],
@@ -13,7 +15,7 @@
           "xsuaa"
         ],
         "credentials": {
-          "url": "http://arch.homework/otusapp/audintsev/auth/realms/myrealm",
+          "url": "http://arch.homework/auth/realms/myrealm",
           "xsappname": "hw-app",
           "clientid": "myclient",
           "clientsecret": "myclient-secret"
