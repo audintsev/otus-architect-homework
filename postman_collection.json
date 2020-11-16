@@ -13,6 +13,8 @@
 					"script": {
 						"id": "629762a3-700b-437a-80fe-eb91ed0fec8a",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
+							"\r",
 							"var responseJSON = JSON.parse(responseBody)\r",
 							"const adminAccessToken = responseJSON.access_token\r",
 							"pm.environment.set(\"adminAccessToken\", adminAccessToken);\r",
@@ -102,9 +104,13 @@
 					"script": {
 						"id": "513d395a-11de-4c78-8121-71cfa0dbe034",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 201`] = pm.response.code === 201\r",
+							"\r",
 							"const locationHeader = pm.response.headers.get('Location')\r",
 							"const id = locationHeader.substring(locationHeader.lastIndexOf(\"/\") + 1)\r",
-							"pm.environment.set(\"userid1\", id)"
+							"pm.environment.set(\"userid1\", id)\r",
+							"\r",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -168,6 +174,7 @@
 					"script": {
 						"id": "392c965b-0d1e-4e90-8ed5-8cf2d0099d06",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 204`] = pm.response.code === 204\r",
 							""
 						],
 						"type": "text/javascript"
@@ -233,6 +240,8 @@
 					"script": {
 						"id": "9e624bf4-600a-4825-9baf-4bcd4b5545c3",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 201`] = pm.response.code === 201\r",
+							"\r",
 							"const locationHeader = pm.response.headers.get('Location')\r",
 							"const id = locationHeader.substring(locationHeader.lastIndexOf(\"/\") + 1)\r",
 							"pm.environment.set(\"userid2\", id)"
@@ -299,6 +308,7 @@
 					"script": {
 						"id": "352d2455-a20c-4fa6-851b-77d9c66d488b",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 204`] = pm.response.code === 204\r",
 							""
 						],
 						"type": "text/javascript"
@@ -364,6 +374,8 @@
 					"script": {
 						"id": "473039d9-777b-4732-bfca-b35e2659dcf5",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
+							"\r",
 							"const re = /action=\"([^\"]+)\"/\r",
 							"const capturedPostUrl = re.exec(responseBody)[1]\r",
 							"\r",
@@ -415,6 +427,7 @@
 					"script": {
 						"id": "7b9bdc33-2ea5-4bf9-876c-ea8ec77dbe2c",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
 							""
 						],
 						"type": "text/javascript"
@@ -464,6 +477,8 @@
 					"script": {
 						"id": "40afeb18-fa55-485f-a471-e7898a085570",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 201`] = pm.response.code === 201\r",
+							"\r",
 							"var responseJSON = JSON.parse(responseBody)\r",
 							"pm.environment.set(\"user1AppId\", responseJSON[\"id\"])\r",
 							""
@@ -499,6 +514,7 @@
 					"script": {
 						"id": "32844d3f-eb57-4bd6-9988-ad8301077b42",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
 							""
 						],
 						"type": "text/javascript"
@@ -542,6 +558,8 @@
 					"script": {
 						"id": "56171931-cbce-446c-9b46-7ece5e51536f",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
+							"\r",
 							"var responseJSON = JSON.parse(responseBody)\r",
 							"tests[`[Check user1 profile in the app has changed` ] = responseJSON.firstName === \"John\" && responseJSON.lastName === \"Doe\"\r",
 							""
@@ -577,6 +595,7 @@
 					"script": {
 						"id": "367873da-e072-4145-82b2-051273e6af32",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
 							""
 						],
 						"type": "text/javascript"
@@ -609,6 +628,8 @@
 					"script": {
 						"id": "40a31c06-3dae-48ee-8ac8-78bf48116dfc",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
+							"\r",
 							"const re = /action=\"([^\"]+)\"/\r",
 							"const capturedPostUrl = re.exec(responseBody)[1]\r",
 							"\r",
@@ -660,6 +681,7 @@
 					"script": {
 						"id": "fc24a71b-8383-427c-a58d-9ffe12d4ce04",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
 							""
 						],
 						"type": "text/javascript"
@@ -709,6 +731,8 @@
 					"script": {
 						"id": "dc61c4d4-3f6f-4821-b866-e4a7686478f3",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 201`] = pm.response.code === 201\r",
+							"\r",
 							"var responseJSON = JSON.parse(responseBody)\r",
 							"pm.environment.set(\"user2AppId\", responseJSON[\"id\"])\r",
 							""
@@ -744,6 +768,8 @@
 					"script": {
 						"id": "4876dfde-f177-4bbd-b747-53967bf12861",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
+							"\r",
 							"var responseJSON = JSON.parse(responseBody)\r",
 							"tests[`[Check user1 profile in the app has changed` ] = responseJSON.firstName === \"John\" && responseJSON.lastName === \"Doe\"\r",
 							""
@@ -779,6 +805,7 @@
 					"script": {
 						"id": "e5b8bb75-48b0-4821-9fef-b255008edad4",
 						"exec": [
+							"tests[`Status code ${pm.response.code} is 403`] = pm.response.code === 403\r",
 							""
 						],
 						"type": "text/javascript"
@@ -845,42 +872,42 @@
 	],
 	"variable": [
 		{
-			"id": "2b235d72-0273-4792-a8a5-0b655f34c1df",
+			"id": "b6cfbd70-9986-4c81-bd74-83a0f08fbe59",
 			"key": "baseUrl",
 			"value": "http://arch.homework"
 		},
 		{
-			"id": "21bc7334-fa34-40b5-b6d6-a7364b54ceed",
+			"id": "feb9f64d-9eb6-422e-b829-e3b626f5cce4",
 			"key": "pathPrefix",
 			"value": ""
 		},
 		{
-			"id": "f8d7957e-f9a0-466c-99e1-a92e6d473ef4",
+			"id": "df6e58a3-61c7-4ce6-a42b-a48b31f49c68",
 			"key": "keycloakUrl",
 			"value": "{{baseUrl}}{{pathPrefix}}/auth"
 		},
 		{
-			"id": "b30dd5f6-288c-47ff-8c47-21227a8856c4",
+			"id": "e6eb41e4-92d2-48a9-8025-4a845db52c3b",
 			"key": "keycloakAdminName",
 			"value": "admin"
 		},
 		{
-			"id": "c10fbb6e-ad57-42ed-8e71-f30e2cfabb2b",
+			"id": "2f2ec048-b656-4c96-bffb-3d6fc36377d9",
 			"key": "keycloakAdminPassword",
 			"value": "admin"
 		},
 		{
-			"id": "71c1247f-d2e0-458b-989f-3685dda04679",
+			"id": "8afd0246-1a36-4de1-a1e8-c7193a2f1e9e",
 			"key": "realm",
 			"value": "myrealm"
 		},
 		{
-			"id": "acd1f2bb-6779-4d07-a1bf-e40d606d782f",
+			"id": "f1a21d59-8d8c-491a-804b-4796a9a2ae2b",
 			"key": "client",
 			"value": "myclient"
 		},
 		{
-			"id": "63139a7b-28aa-4ed9-a2e0-a434928001b1",
+			"id": "2c701b2d-2245-44f0-be2b-802f6b7b354c",
 			"key": "appUrl",
 			"value": "{{baseUrl}}{{pathPrefix}}/app"
 		}
