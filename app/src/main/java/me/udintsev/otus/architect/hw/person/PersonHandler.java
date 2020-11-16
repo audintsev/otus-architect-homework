@@ -1,7 +1,14 @@
 package me.udintsev.otus.architect.hw.person;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.oauth2.core.AbstractOAuth2Token;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -22,8 +29,9 @@ import java.util.function.Supplier;
 @Transactional(readOnly = true)
 public class PersonHandler {
     public static final String URI_BASE = "/person";
-    public static final String URI_WITH_ID = "%s/{%s}".formatted(PersonHandler.URI_BASE, PersonHandler.PATH_VARIABLE_ID);
+    public static final String URI_REGISTER = "%s/register".formatted(URI_BASE);
     public static final String PATH_VARIABLE_ID = "id";
+    public static final String URI_WITH_ID = "%s/{%s}".formatted(URI_BASE, PATH_VARIABLE_ID);
 
     private final Validator validator;
     private final PersonService personService;
@@ -49,6 +57,19 @@ public class PersonHandler {
 
     @Data
     @Valid
+    static class PersonCreateRequest {
+        @NotNull
+        String email;
+
+        @NotNull
+        String firstName;
+
+        @NotNull
+        String lastName;
+    }
+
+    @Data
+    @Valid
     static class PersonUpdateRequest {
         @NotNull
         String firstName;
@@ -58,10 +79,30 @@ public class PersonHandler {
     }
 
     @Transactional
+    public Mono<ServerResponse> register() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .filter(authentication -> authentication.getCredentials() instanceof AbstractOAuth2Token)
+                .map(Authentication::getCredentials)
+                .cast(Jwt.class)
+                .flatMap(jwt -> {
+                    var claims = jwt.getClaims();
+                    String email = (String)claims.get("email");
+                    String firstName = (String)claims.get("given_name");
+                    String lastName = (String)claims.get("family_name");
+                    return personService.create(email, firstName, lastName)
+                            .flatMap(person -> ServerResponse
+                                    .created(URI.create(String.format("%s/%s", URI_BASE, person.getId())))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .bodyValue(person));
+                });
+    }
+
+    @Transactional
     public Mono<ServerResponse> create(ServerRequest request) {
-        return request.bodyToMono(PersonUpdateRequest.class)
+        return request.bodyToMono(PersonCreateRequest.class)
                 .flatMap(body -> validateAndThen(body, () ->
-                        personService.create(body.getFirstName(), body.getLastName())
+                        personService.create(body.getEmail(), body.getFirstName(), body.getLastName())
                                 .flatMap(person -> ServerResponse
                                         .created(URI.create(String.format("%s/%s", URI_BASE, person.getId())))
                                         .contentType(MediaType.APPLICATION_JSON)
@@ -72,13 +113,17 @@ public class PersonHandler {
     @Transactional
     public Mono<ServerResponse> update(ServerRequest request) {
         return request.bodyToMono(PersonUpdateRequest.class)
-                .flatMap(body -> validateAndThen(body, () ->
-                        personService.update(idFromRequest(request), body.getFirstName(), body.getLastName())
+                .flatMap(body -> validateAndThen(body, () -> {
+                        long id = idFromRequest(request);
+                        return personService.get(id)
+                                .flatMap(person ->
+                                    personService.update(person.getId(), person.getEmail(), body.getFirstName(), body.getLastName())
+                                )
                                 .flatMap(person -> ServerResponse.ok()
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .bodyValue(person)))
-                        .switchIfEmpty(ServerResponse.notFound().build())
-                );
+                                        .bodyValue(person))
+                                .switchIfEmpty(ServerResponse.notFound().build());
+                }));
     }
 
     @Transactional

@@ -28,7 +28,7 @@ class PersonServiceTest {
             assertThat(person.getFirstName()).isEqualTo("SomeFirst");
             assertThat(person.getLastName()).isEqualTo("SomeLast");
         };
-        personService.create("SomeFirst", "SomeLast").as(StepVerifier::create)
+        personService.create("first.last@example.com", "SomeFirst", "SomeLast").as(StepVerifier::create)
                 .assertNext(person1Verifier)
                 .verifyComplete();
 
@@ -38,7 +38,7 @@ class PersonServiceTest {
             assertThat(person.getFirstName()).isEqualTo("AnotherFirst");
             assertThat(person.getLastName()).isEqualTo("AnotherLast");
         };
-        personService.create("AnotherFirst", "AnotherLast").as(StepVerifier::create)
+        personService.create("1.2@example.com", "AnotherFirst", "AnotherLast").as(StepVerifier::create)
                 .assertNext(person2Verifier)
                 .verifyComplete();
 

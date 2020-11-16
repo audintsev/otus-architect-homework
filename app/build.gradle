@@ -5,7 +5,7 @@ plugins {
     id 'java'
 }
 
-group = 'me.udintsev.otus.architect'
+group = 'me.udintsev.otus.architect.homework'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '15'
 

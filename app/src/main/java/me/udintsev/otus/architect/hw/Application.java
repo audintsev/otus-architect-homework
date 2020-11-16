@@ -25,6 +25,7 @@ public class Application {
                 .GET(PersonHandler.URI_WITH_ID, personHandler::get)
                 .GET(PersonHandler.URI_BASE, req -> personHandler.list())
                 .POST(PersonHandler.URI_BASE, personHandler::create)
+                .POST(PersonHandler.URI_REGISTER, req -> personHandler.register())
                 .PUT(PersonHandler.URI_WITH_ID, personHandler::update)
                 .DELETE(PersonHandler.URI_WITH_ID, personHandler::delete)
                 .resources("/**", new ClassPathResource("static/"))
