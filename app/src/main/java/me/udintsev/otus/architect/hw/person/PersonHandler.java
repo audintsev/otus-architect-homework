@@ -1,7 +1,6 @@
 package me.udintsev.otus.architect.hw.person;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -9,7 +8,6 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.oauth2.core.AbstractOAuth2Token;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -18,7 +16,6 @@ import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple3;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -31,9 +28,9 @@ import java.util.function.Supplier;
 @Component
 @Transactional(readOnly = true)
 public class PersonHandler {
+    public static final String URI_HELLO = "/hello";
     public static final String URI_BASE = "/person";
     public static final String URI_REGISTER = "%s/register".formatted(URI_BASE);
-    public static final String URI_HELLO = "%s/hello".formatted(URI_BASE);
     public static final String PATH_VARIABLE_ID = "id";
     public static final String URI_WITH_ID = "%s/{%s}".formatted(URI_BASE, PATH_VARIABLE_ID);
 
@@ -53,31 +50,43 @@ public class PersonHandler {
                     if (email != null) {
                         return personService.getByEmail(email)
                                 .flatMap(person -> ServerResponse.ok()
-                                        .contentType(MediaType.TEXT_PLAIN)
-                                        .bodyValue("Welcome back, %s %s (%s)".formatted(
-                                                person.getFirstName(), person.getLastName(), person.getEmail()
-                                        ))
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(Map.of("greeting",
+                                                "Welcome back, %s %s (%s)".formatted(
+                                                        person.getFirstName(), person.getLastName(), person.getEmail()
+                                                ))
+                                        )
                                 )
                                 .switchIfEmpty(ServerResponse.ok()
-                                        .contentType(MediaType.TEXT_PLAIN)
-                                        .bodyValue("Hello %s %s (%s), go ahead and register!".formatted(
-                                                jwt.getClaims().get("given_name"),
-                                                jwt.getClaims().get("family_name"),
-                                                email
-                                        )));
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(Map.of("greeting",
+                                                "Hello %s %s (%s), go ahead and register!".formatted(
+                                                        jwt.getClaims().get("given_name"),
+                                                        jwt.getClaims().get("family_name"),
+                                                        email
+                                                )))
+                                );
                     } else {
                         return ServerResponse.ok()
-                                .contentType(MediaType.TEXT_PLAIN)
-                                .bodyValue("Hello email-less user :(");
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(Map.of("greeting", "Hello email-less user ;("));
                     }
-                })
-                .flatMap(person -> ServerResponse.ok().bodyValue(person))
-                .switchIfEmpty(ServerResponse.notFound().build());
+                });
     }
 
     public Mono<ServerResponse> get(ServerRequest request) {
-        return personService.get(idFromRequest(request))
-                .flatMap(person -> ServerResponse.ok().bodyValue(person))
+        return Mono.zip(personService.get(idFromRequest(request)), getJwt())
+                .flatMap(tuple -> {
+                    var person = tuple.getT1();
+                    var jwt = tuple.getT2();
+
+                    var jwtEmail = (String) jwt.getClaims().get("email");
+                    if (Objects.equals(person.getEmail(), jwtEmail)) {
+                        return ServerResponse.ok().bodyValue(person);
+                    } else {
+                        return ServerResponse.status(HttpStatus.FORBIDDEN).build();
+                    }
+                })
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 

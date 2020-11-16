@@ -408,12 +408,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{appUrl}}/person",
+					"raw": "{{appUrl}}/hello",
 					"host": [
 						"{{appUrl}}"
 					],
 					"path": [
-						"person"
+						"hello"
 					]
 				}
 			},
@@ -561,7 +561,7 @@
 							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
 							"\r",
 							"var responseJSON = JSON.parse(responseBody)\r",
-							"tests[`[Check user1 profile in the app has changed` ] = responseJSON.firstName === \"John\" && responseJSON.lastName === \"Doe\"\r",
+							"tests[`Check user1 profile in the app has changed` ] = responseJSON.firstName === \"John\" && responseJSON.lastName === \"Doe\"\r",
 							""
 						],
 						"type": "text/javascript"
@@ -662,12 +662,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{appUrl}}/person",
+					"raw": "{{appUrl}}/hello",
 					"host": [
 						"{{appUrl}}"
 					],
 					"path": [
-						"person"
+						"hello"
 					]
 				}
 			},
@@ -768,10 +768,7 @@
 					"script": {
 						"id": "4876dfde-f177-4bbd-b747-53967bf12861",
 						"exec": [
-							"tests[`Status code ${pm.response.code} is 200`] = pm.response.code === 200\r",
-							"\r",
-							"var responseJSON = JSON.parse(responseBody)\r",
-							"tests[`[Check user1 profile in the app has changed` ] = responseJSON.firstName === \"John\" && responseJSON.lastName === \"Doe\"\r",
+							"tests[`Status code ${pm.response.code} is 403`] = pm.response.code === 403\r",
 							""
 						],
 						"type": "text/javascript"
@@ -872,42 +869,42 @@
 	],
 	"variable": [
 		{
-			"id": "b6cfbd70-9986-4c81-bd74-83a0f08fbe59",
+			"id": "5a44b8be-da46-4abb-b95c-1f99897b9703",
 			"key": "baseUrl",
 			"value": "http://arch.homework"
 		},
 		{
-			"id": "feb9f64d-9eb6-422e-b829-e3b626f5cce4",
+			"id": "bf2d5243-51fd-435b-b1ae-31a8c8daf6e3",
 			"key": "pathPrefix",
 			"value": ""
 		},
 		{
-			"id": "df6e58a3-61c7-4ce6-a42b-a48b31f49c68",
+			"id": "600a15f9-106f-4fd2-8b5c-4e301fdaa4ef",
 			"key": "keycloakUrl",
 			"value": "{{baseUrl}}{{pathPrefix}}/auth"
 		},
 		{
-			"id": "e6eb41e4-92d2-48a9-8025-4a845db52c3b",
+			"id": "b0b0f4d9-b68f-43ae-b7a9-95afeb03cd5f",
 			"key": "keycloakAdminName",
 			"value": "admin"
 		},
 		{
-			"id": "2f2ec048-b656-4c96-bffb-3d6fc36377d9",
+			"id": "fd6c3fcc-0598-4bb0-85ec-7b44c0ca6c3b",
 			"key": "keycloakAdminPassword",
 			"value": "admin"
 		},
 		{
-			"id": "8afd0246-1a36-4de1-a1e8-c7193a2f1e9e",
+			"id": "92ad6936-fa9a-4fe1-b105-09ce112a03aa",
 			"key": "realm",
 			"value": "myrealm"
 		},
 		{
-			"id": "f1a21d59-8d8c-491a-804b-4796a9a2ae2b",
+			"id": "4ab629de-35ef-4fbf-ac6e-278a04c18e48",
 			"key": "client",
 			"value": "myclient"
 		},
 		{
-			"id": "2c701b2d-2245-44f0-be2b-802f6b7b354c",
+			"id": "aeda988c-59de-419c-8c83-4f6caf8e2051",
 			"key": "appUrl",
 			"value": "{{baseUrl}}{{pathPrefix}}/app"
 		}
