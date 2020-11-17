@@ -88,7 +88,7 @@ spec:
             - name: PRESERVE_FRAGMENT
               value: "false"
             - name: CALLBACK_URL
-              value: {{ include "udintsev-hw-chart.gwFrontendUrl" . }}login/callback
+              value: {{ include "udintsev-hw-chart.gwFrontendUrl" . }}/login/callback
             - name: destinations
               value: |
                 [
