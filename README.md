@@ -1,58 +1,71 @@
 # Homework for lessons 6, 7 and 11 (see tags) of the [Otus "Software Architect" course](https://otus.ru/lessons/arhitektor-po/) 
 
-## Deploying as Helm release
+## Deployment
 
 Deploying:
 ```
 git clone https://github.com/audintsev/otus-architect-homework.git
 cd otus-architect-homework
-helm install udintsev-hw ./chart
+git checkout hw12
+
+kubectl create ns udintsev
+helm install -n udintsev hw12 ./chart
+```
+
+Installation takes rather long, because helm also needs to perform initializations in hooks:
+* Create schema for the app (needs app-db to start up)
+* Create in a realm and a client in Keycloak (needs that Keycloak starts) 
+
+So it's best to observe the progress while deploying (in a different terminal):
+```
+watch kubectl -n udintsev get all
 ```
 
 Undeploying:
 ```
-helm uninstall udintsev-hw
+helm uninstall -n udintsev hw12
+for pvc in $(kubectl get pvc -n udintsev -o jsonpath='{.items[*].metadata.name}'); do kubectl delete -n udintsev pvc $pvc; done
+kubectl delete ns udintsev
 ```
 
-Optionally, to delete also PVC: `kubectl get pvc`, followed by: `kubectl delete pvc data-udintsev-hw-postgresql-0`
+## Architecture
 
+![Architecture diagram](README.assets/diagram.png)
+
+Features:
+* Using [Keycloak](https://www.keycloak.org/) as Identity Provider (IdP)
+* Using [@sap/approuter](https://www.npmjs.com/package/@sap/approuter) as API gateway
+* Usage of [Nginx Ingress Controller](https://kubernetes.github.io/ingress-nginx/) as edge Ingress Controller is assumed
+
+Logic:
+* The user logs in to the [gateway](gateway), which delegates authentication to IdP, leveraging "Authorization Code" flow
+* The gateway obtains a JWT token on user's behalf and stores it in its in-memory session storage
+* The session between the [gateway](gateway) and browser is tracked using an opaque cookie
+* The gateway serves as reverse proxy (and a router) and OpaqueCookie -> JWT cache
+* Application proxied by the gateway receives JWT and performs offline validation
+
+After deploying, you can quickly check operation in browser:
+* [Keycloak](http://arch.homework/auth/) (login as admin/admin), [create a user in 'myrealm' realm](http://arch.homework/auth/admin/master/console/#/realms/myrealm/users)
+* [Access application](http://arch.homework/app/hello), logging in as the created user
 
 ## Invoking the postman collection
 
-After deploying, wait till `http://arch.homework/otusapp/audintsev/actuator/health/readiness`
-starts to report readiness and then `cd` to the root of the cloned repo and execute:
+Run from the root of the cloned repo:
 ```
 newman run postman_collection.json 
 ```
 
-## Invoking with curl
+The scenario is:
 
-Assuming `arch.homework` resolves to the IP address where Ingress controller listens,
-
-List people:
-```
-curl http://arch.homework/otusapp/audintsev/person
-```
-
-Add a person:
-```
-curl -H 'Content-Type: application/json' http://arch.homework/otusapp/audintsev/person -d '{"first": "Some", "last": "Other"}'
-```
-
-Get a specific person:
-```
-curl http://arch.homework/otusapp/audintsev/person/1
-```
-
-Update a person:
-```
-curl -H 'Content-Type: application/json' -X PUT http://arch.homework/otusapp/audintsev/person/2 -d '{"first": "Yet", "last": "Another"}'
-```
-
-Delete a person:
-```
-curl -X DELETE http://arch.homework/otusapp/audintsev/person/2
-```
+* IdP admin creates two users and sets passwords for them
+* User1 logs in: access app -> redirected to IdP's login page -> logs in to IdP (POST a login form) ->
+redirected with authorization code to the gateway -> redirected to the original app URL (authenticated)
+* User1 registers in the application
+* User1 changes his profile in the app
+* User1 logs out
+* User2 logs in (same sequence as for User1)
+* User2 registers in the app
+* User2 attempts to read and change profile of User1 (both fails with status code 403/Forbidden)
 
 ## Application
 
@@ -62,8 +75,9 @@ Application-wise, this repository showcases the following technologies being use
 * Testcontainers to run integration tests with Postgresql
 * Spring REST Docs to generate API documentation out of API tests
 
-TODO (?):
+TODO:
 
+* Fix API tests and generating documentation
 * Building native image
 * CI with Github actions (possibly publishing generated API docs as a Github pages site)
   
@@ -80,38 +94,24 @@ version doesn't match what application expects; but that's exactly what seems to
 a new application version makes some additions to the schema (e.g. a new column), and the two versions - the old
 one and the new one - co-exist in the same deployment. 
 
-### App: building and running
+## Links
 
-Building:
-
-```
-./gradlew bootJar
-```
-
-Running (assuming Postgres is available on localhost:5432):
-
-```
-java -jar otus-architect-homework-0.0.1-SNAPSHOT.jar --spring.r2dbc.url=r2dbc:postgresql://localhost/test --spring.r2dbc.username=test --spring.r2dbc.password=test
-```
-
-### Image: building and pushing
-
-```
-cd app
-./gradlew bootBuildImage --imageName=udintsev/hw12-app:latest
-docker push udintsev/hw12-app:latest
-
-cd ../gateway
-docker build -t udintsev/hw12-gw:latest .
-docker push udintsev/hw12-gw:latest
-```
-
-### Useful links
+### Application
 
 * [R2DBC on Spring Framework](https://docs.spring.io/spring-framework/docs/5.3.0-RC2/reference/html/data-access.html#r2dbc)
 * [WebFllux on Spring Framework](https://docs.spring.io/spring-framework/docs/5.3.0-RC2/reference/html/web-reactive.html#spring-webflux)
 * [R2DBC support in Testcontainers](https://www.testcontainers.org/modules/databases/r2dbc/)
 * [Spring REST Docs](https://docs.spring.io/spring-restdocs/docs/current/reference/html5/) 
+* [Spring Security OAuth2 and Febflux](https://docs.spring.io/spring-security/site/docs/5.4.1/reference/html5/#webflux-oauth2)
+* [Spring Security OAuth2 and Febflux: Testing](https://docs.spring.io/spring-security/site/docs/5.4.1/reference/html5/#webflux-testing-jwt)
+* [Testing with fake authorization server](https://engineering.pivotal.io/post/faking_oauth_sso/)
+* [Baeldung: OAuth Resource Server](https://www.baeldung.com/spring-security-oauth-resource-server)
+
+
+### Keycloak
+
+* https://github.com/keycloak/keycloak-documentation/blob/master/server_development/topics/admin-rest-api.adoc
+* https://www.keycloak.org/docs-api/5.0/rest-api/index.html
 
 ## Gathering pod metrics for CPU and memory usage
 
@@ -153,17 +153,28 @@ metrics are essentially documented [here](https://www.postgresql.org/docs/9.2/mo
 
 [Sample Grafana dashboard](https://grafana.com/grafana/dashboards/9628)
 
-# Keycloak
+## DEV-specific
 
-https://github.com/keycloak/keycloak-documentation/blob/master/server_development/topics/admin-rest-api.adoc
-https://www.keycloak.org/docs-api/5.0/rest-api/index.html
+My 'dev' cluster exposes endpoint `arch.labs`, this section provides some shortcuts for my convenience.
 
-https://docs.spring.io/spring-security/site/docs/5.4.1/reference/html5/#webflux-oauth2
-https://docs.spring.io/spring-security/site/docs/5.4.1/reference/html5/#webflux-testing-jwt
+Deploying:
+```
+helm install -n udintsev --create-namespace hw12 ./chart --set "ingress.host=arch.labs"
+```
 
-https://engineering.pivotal.io/post/faking_oauth_sso/
-https://www.baeldung.com/spring-security-oauth-resource-server
-
+Or, using an alternative endpoint (I do that for my 'dev' cluster):
 ```
 newman run --env-var "baseUrl=http://arch.labs" postman_collection.json
+```
+
+Building and pushing (app build requires Java 15):
+
+```
+cd app
+./gradlew bootBuildImage --imageName=udintsev/hw12-app:latest
+docker push udintsev/hw12-app:latest
+
+cd ../gateway
+docker build -t udintsev/hw12-gw:latest .
+docker push udintsev/hw12-gw:latest
 ```

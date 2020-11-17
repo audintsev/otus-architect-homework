@@ -14,7 +14,7 @@ service:
 
 ingress:
   proto: http
-  host: arch.labs
+  host: arch.homework
   pathPrefix:
   gwPath:
   # That doesn't work currently:
